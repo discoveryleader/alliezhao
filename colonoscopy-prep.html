@@ -118,6 +118,31 @@
   .no h3 { color: var(--danger); }
   .yes ul, .no ul { margin: 0; padding-left: 20px; }
 
+  /* Full multi-day schedule */
+  .legend { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+  .chip { display: inline-block; font-size: .78rem; font-weight: 650; border-radius: 99px; padding: 2px 10px; border: 1px solid transparent; white-space: nowrap; }
+  .chip.glp { background: var(--warn-soft); color: var(--warn); }
+  .chip.mira { background: var(--accent-soft); color: var(--accent); }
+  .chip.diet { background: var(--ok-soft); color: var(--ok); }
+  .chip.supp { background: var(--card); color: var(--muted); border-color: var(--line); }
+  .chip.clear { background: var(--accent); color: #fff; }
+  .chip.npo { background: var(--danger); color: #fff; }
+  .days { list-style: none; margin: 0; padding: 0; }
+  .day { display: grid; grid-template-columns: 92px 1fr; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .day:first-child { border-top: 0; }
+  .day .date { font-weight: 700; }
+  .day .date small { display: block; font-weight: 500; color: var(--muted); font-size: .78rem; }
+  .day .chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 4px; }
+  .day ul { margin: 4px 0 0; padding-left: 20px; }
+  .day.past { opacity: .55; }
+  .day.today { background: var(--accent-soft); border-radius: 10px; padding-left: 10px; padding-right: 10px; margin: 0 -10px; opacity: 1; }
+  .day.key .date { color: var(--danger); }
+  .day .open { font: inherit; font-size: .88rem; margin-top: 6px; padding: 4px 10px; }
+
+  @media (max-width: 560px) {
+    .day { grid-template-columns: 1fr; gap: 4px; }
+  }
+
   details.card summary { cursor: pointer; font-weight: 650; }
   details.card[open] summary { margin-bottom: 10px; }
 
@@ -171,9 +196,26 @@
   </div>
 
   <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-all" aria-controls="panel-all" aria-selected="false">Full schedule<small>Sep 22 – Oct 2 · day by day</small></button>
     <button class="tab" role="tab" id="tab-before" aria-controls="panel-before" aria-selected="true">Day before<small>Thu, Oct 1 · clear liquids + Dose 1</small></button>
     <button class="tab" role="tab" id="tab-day" aria-controls="panel-day" aria-selected="false">Procedure day<small>Fri, Oct 2 · Dose 2 + check-in</small></button>
   </div>
+
+  <section class="panel" id="panel-all" role="tabpanel" aria-labelledby="tab-all" hidden>
+    <div class="card">
+      <h2>Procedure days schedule — Sep 22 to Oct 2</h2>
+      <div class="legend">
+        <span class="chip glp">GLP-1 paused*</span>
+        <span class="chip mira">MiraLAX daily</span>
+        <span class="chip diet">Low-fiber diet</span>
+        <span class="chip supp">No vitamins/supplements</span>
+        <span class="chip clear">Clear liquids only</span>
+        <span class="chip npo">Nothing by mouth</span>
+      </div>
+      <ol class="days" id="days"></ol>
+      <p class="foot" style="margin-top:10px">*Only if you take a GLP-1 medication (Ozempic, Wegovy, Mounjaro, Saxenda, etc.).</p>
+    </div>
+  </section>
 
   <section class="panel" id="panel-before" role="tabpanel" aria-labelledby="tab-before">
     <div class="card">
@@ -230,15 +272,6 @@
     Do <strong>not</strong> take Bisacodyl (Dulcolax) if you are over 70 or have diarrhea.
     GLP-1 users (Ozempic, Wegovy, Mounjaro, Saxenda, etc.): skip your GLP-1 injection for 10 days before the procedure. If you take a GLP-1, opioid pain medicine, or have constipation, take Bisacodyl 10 mg in the evening on <strong>both</strong> of the two days before your colonoscopy.
   </div>
-
-  <details class="card">
-    <summary>Earlier prep (already underway)</summary>
-    <ul>
-      <li><strong>Sep 22 (10 days prior):</strong> Get your prep kit — Suflave, Simethicone (Gas-X Extra Strength 125 mg soft gels), and Bisacodyl (Dulcolax 5 mg delayed-release tablets). GLP-1 users stop injections.</li>
-      <li><strong>Sep 25 on (7 days prior):</strong> MiraLAX daily — additional instruction from your doctor.</li>
-      <li><strong>Sep 27 (5 days prior):</strong> Arrange your driver. Dietary restrictions begin: no fresh fruit or vegetables (cooked/canned only), no salads, seeds, or raw nuts (creamy nut butter is OK), no popcorn, whole corn, granola, or oatmeal. Stop multivitamins, supplements, iron, fish oil, and other oily capsules.</li>
-    </ul>
-  </details>
 
   <div class="toolbar">
     <button class="btn" id="print">Print</button>
@@ -316,6 +349,68 @@ const SCHEDULE = {
   ],
 };
 
+// ---- Full multi-day schedule (Sep 22 – Oct 2). Ranges are inclusive. ----
+const RANGES = [
+  { chip: "glp",  label: "GLP-1 paused*",           from: "2026-09-22", to: "2026-10-02" },
+  { chip: "mira", label: "MiraLAX daily",           from: "2026-09-25", to: "2026-10-01" },
+  { chip: "diet", label: "Low-fiber diet",          from: "2026-09-27", to: "2026-09-30" },
+  { chip: "supp", label: "No vitamins/supplements", from: "2026-09-27", to: "2026-10-02" },
+  { chip: "clear",label: "Clear liquids only",      from: "2026-10-01", to: "2026-10-02" },
+  { chip: "npo",  label: "Nothing by mouth 5:45 AM", from: "2026-10-02", to: "2026-10-02" },
+];
+const DAY_NOTES = {
+  "2026-09-22": { tag: "10 days prior", items: [
+    "Get your prep kit: Suflave, Simethicone (Gas-X Extra Strength 125 mg soft gels), and Bisacodyl (Dulcolax 5 mg delayed-release tablets). If it isn't from GiftHealth, buy the pills over the counter.",
+    "GLP-1 users: stop your GLP-1 injection from today until after the procedure."] },
+  "2026-09-25": { tag: "7 days prior", items: [
+    "Start MiraLAX daily (your doctor's additional instruction)."] },
+  "2026-09-27": { tag: "5 days prior", items: [
+    "Arrange a family member or friend to drive you home. No ride = no sedation.",
+    "Low-fiber diet begins: no fresh fruit or vegetables (cooked or canned only); no salads, seeds, or raw nuts (creamy nut butter is OK); no popcorn, whole corn, granola, or oatmeal.",
+    "Stop multivitamins, supplements, iron, fish oil, and other oily capsules. Keep taking prescription medications.",
+    "Last day to cancel or reschedule without a potential fee. Call 425-899-4500."] },
+  "2026-09-30": { tag: "2 days prior", items: [
+    "Last day of (low-fiber) solid food.",
+    "Only if you take a GLP-1, opioid pain medicine, or are constipated: take Bisacodyl 10 mg (2 × 5 mg tablets) this evening.",
+    "Check you have everything: Suflave kit, Gas-X, Dulcolax, clear liquids for tomorrow."] },
+  "2026-10-01": { tag: "Day before", key: true, open: "tab-before", items: [
+    "No solid food. Clear liquids only, at least 8 oz every hour.",
+    "Morning: mix the Suflave and refrigerate it.",
+    "3:00 PM: 2 Bisacodyl · 5:00 PM: DOSE 1 · 6:00 PM: 4 Gas-X soft gels."] },
+  "2026-10-02": { tag: "Procedure day", key: true, open: "tab-day", items: [
+    "2:45 AM: DOSE 2 + 4 Gas-X soft gels.",
+    "5:45 AM: STOP, nothing by mouth.",
+    "9:45 AM: arrive at Gastro Health at Kirkland with your driver."] },
+};
+
+function ymd(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function renderDays(now) {
+  const today = ymd(now);
+  const rows = [];
+  for (let d = new Date("2026-09-22T12:00"); ymd(d) <= "2026-10-02"; d.setDate(d.getDate() + 1)) {
+    const key = ymd(d);
+    const note = DAY_NOTES[key] || { items: ["Keep following the restrictions shown."] };
+    const until = Math.round((new Date("2026-10-02T12:00") - d) / 86400000);
+    const tag = note.tag || `${until} days prior`;
+    const chips = RANGES.filter(r => key >= r.from && key <= r.to)
+      .map(r => `<span class="chip ${r.chip}">${esc(r.label)}</span>`).join("");
+    const cls = ["day", key < today && "past", key === today && "today", note.key && "key"].filter(Boolean).join(" ");
+    rows.push(`<li class="${cls}">
+      <div class="date">${d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+        <small>${esc(tag)}${key === today ? " · Today" : ""}</small></div>
+      <div>
+        <div class="chips">${chips}</div>
+        <ul>${note.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
+        ${note.open ? `<button class="btn open" data-open="${note.open}">Open step-by-step checklist →</button>` : ""}
+      </div>
+    </li>`);
+  }
+  document.getElementById("days").innerHTML = rows.join("");
+}
+
 const KEY = "colonoscopy-prep-checks-v1";
 const store = {
   get() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } },
@@ -352,6 +447,7 @@ function render() {
     document.getElementById("bar-" + day).style.width = (100 * n / steps.length) + "%";
     document.getElementById("count-" + day).textContent = `${n} of ${steps.length} done`;
   }
+  renderDays(now);
   renderNow(now);
 }
 
@@ -420,8 +516,16 @@ function selectTab(id) {
   });
 }
 tabs.forEach(t => t.addEventListener("click", () => selectTab(t.id)));
-// Open procedure-day tab automatically from the evening of the day before onward.
-if (new Date() >= new Date("2026-10-02T00:00")) selectTab("tab-day");
+// Open the tab that fits today: full schedule before Oct 1, then the day's checklist.
+{
+  const t = new Date();
+  selectTab(t >= new Date("2026-10-02T00:00") ? "tab-day"
+    : t >= new Date("2026-10-01T00:00") ? "tab-before" : "tab-all");
+}
+document.addEventListener("click", e => {
+  const id = e.target.dataset && e.target.dataset.open;
+  if (id) { selectTab(id); document.getElementById(id).scrollIntoView({ behavior: "smooth" }); }
+});
 
 document.addEventListener("change", e => {
   const id = e.target.dataset && e.target.dataset.id;
