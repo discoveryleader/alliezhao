@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Personal Book Library</title>
-<meta name="description" content="Upload a photo of a book's barcode to look up its title and author and save it to your personal library.">
+<title>My Book Library</title>
+<meta name="description" content="Scan a book's barcode to add it to your library, then track reading status, dates, rating, category, tags, format and location.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -22,8 +22,12 @@
     --accent: #2f5d50;
     --accent-ink: #ffffff;
     --accent-soft: #e1ece7;
+    --star: #e0a526;
+    --star-off: #d9d2c5;
     --danger: #b3402f;
     --danger-soft: #f8e4df;
+    --started: #9a5b13;
+    --started-soft: #fbecd3;
     --shadow: 0 1px 2px rgba(31,28,24,.05), 0 6px 20px rgba(31,28,24,.06);
     --radius: 16px;
   }
@@ -31,13 +35,15 @@
     :root:not([data-theme="light"]) {
       --bg: #161513; --surface: #201e1b; --surface-2: #2a2723; --ink: #f3efe8; --ink-2: #c3bbb0;
       --ink-3: #8a8378; --line: #35312c; --accent: #7fb8a5; --accent-ink: #10221c; --accent-soft: #23332d;
-      --danger: #e58a7a; --danger-soft: #3a2420; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+      --star: #f2b84b; --star-off: #4a453e; --danger: #e58a7a; --danger-soft: #3a2420;
+      --started: #f0b866; --started-soft: #3a2c18; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
     }
   }
   :root[data-theme="dark"] {
     --bg: #161513; --surface: #201e1b; --surface-2: #2a2723; --ink: #f3efe8; --ink-2: #c3bbb0;
     --ink-3: #8a8378; --line: #35312c; --accent: #7fb8a5; --accent-ink: #10221c; --accent-soft: #23332d;
-    --danger: #e58a7a; --danger-soft: #3a2420; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+    --star: #f2b84b; --star-off: #4a453e; --danger: #e58a7a; --danger-soft: #3a2420;
+    --started: #f0b866; --started-soft: #3a2c18; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
   }
 
   * { box-sizing: border-box; }
@@ -49,6 +55,7 @@
   }
   button, input, select { font: inherit; color: inherit; }
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+  [hidden] { display: none !important; }
 
   /* Header */
   header { padding: 40px 0 8px; }
@@ -58,60 +65,105 @@
   .sub { color: var(--ink-2); margin: 8px 0 0; }
 
   /* Toolbar */
-  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 28px 0 20px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 28px 0 14px; }
   .search { flex: 1 1 260px; position: relative; }
   .search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ink-3); }
   .search input { width: 100%; padding: 10px 12px 10px 38px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); outline: none; }
-  .search input:focus, select:focus, .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-  select { padding: 10px 34px 10px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); appearance: none; outline: none;
+  input:focus, select:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px var(--accent-soft); }
+  select { padding: 9px 34px 9px 14px; border: 1px solid var(--line); border-radius: 999px; background-color: var(--surface); appearance: none; outline: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238f877b' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 12px center; }
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 18px; border-radius: 999px; border: 1px solid transparent; cursor: pointer; font-weight: 500; white-space: nowrap; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 18px; border-radius: 999px; border: 1px solid transparent; cursor: pointer; font-weight: 500; white-space: nowrap; background: transparent; }
   .btn-primary { background: var(--ink); color: var(--bg); }
   .btn-primary:hover { opacity: .88; }
   .btn-accent { background: var(--accent); color: var(--accent-ink); }
   .btn-accent:hover { opacity: .9; }
-  .btn-ghost { background: transparent; border-color: var(--line); }
+  .btn-ghost { border-color: var(--line); background: var(--surface); }
   .btn-ghost:hover { background: var(--surface-2); }
+  .btn-ghost.on { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .btn-danger { color: var(--danger); }
+  .btn-danger:hover { background: var(--danger-soft); }
+  .btn-sm { padding: 6px 12px; font-size: 13px; }
   .btn:disabled { opacity: .5; cursor: default; }
-  .btn:focus-visible, .icon-btn:focus-visible, .card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn:focus-visible, .icon-btn:focus-visible, .card:focus-visible, .row:focus-visible, .seg input:focus-visible + span, .stars button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .icon-btn { width: 36px; height: 36px; border-radius: 999px; border: 0; background: transparent; display: inline-grid; place-items: center; cursor: pointer; color: var(--ink-2); }
   .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
+  .badge-count { background: var(--accent); color: var(--accent-ink); border-radius: 999px; font-size: 11px; font-weight: 600; min-width: 18px; height: 18px; display: inline-grid; place-items: center; padding: 0 5px; }
 
-  .stats { display: flex; gap: 8px; flex-wrap: wrap; color: var(--ink-2); font-size: 13px; margin-bottom: 16px; }
-  .pill { background: var(--surface); border: 1px solid var(--line); padding: 4px 10px; border-radius: 999px; }
-  .pill b { color: var(--ink); font-weight: 600; }
+  /* Grid / list view toggle */
+  .viewtoggle { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); padding: 3px; }
+  .viewtoggle button { border: 0; background: transparent; border-radius: 999px; padding: 6px 12px; display: inline-flex; gap: 6px; align-items: center; cursor: pointer; color: var(--ink-2); font-size: 14px; }
+  .viewtoggle button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+  /* Filters */
+  .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; margin-bottom: 14px; }
+  .filters label { display: grid; gap: 4px; font-size: 12px; color: var(--ink-3); font-weight: 500; flex: 1 1 140px; }
+  .filters select { width: 100%; color: var(--ink); font-size: 14px; }
+  .filters .clear { align-self: flex-end; }
+
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+  .tabs button { border: 1px solid var(--line); background: var(--surface); padding: 6px 14px; border-radius: 999px; cursor: pointer; font-size: 14px; color: var(--ink-2); display: inline-flex; gap: 6px; align-items: center; }
+  .tabs button span { color: var(--ink-3); font-size: 12px; }
+  .tabs button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .tabs button[aria-pressed="true"] span { color: var(--accent); }
+
+  /* Stars (display) */
+  .stars-view { display: inline-flex; gap: 1px; color: var(--star-off); line-height: 1; }
+  .stars-view .on { color: var(--star); }
+  .stars-view svg { width: 14px; height: 14px; display: block; }
 
   /* Grid */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 20px; padding-bottom: 64px; }
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); position: relative; transition: transform .15s ease; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 20px; padding-bottom: 48px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); position: relative; transition: transform .15s ease; cursor: pointer; text-align: left; padding: 0; }
   .card:hover { transform: translateY(-2px); }
   .cover { aspect-ratio: 2 / 3; background: var(--surface-2); display: grid; place-items: center; overflow: hidden; position: relative; }
   .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .cover .fallback { padding: 16px; text-align: center; font-family: Fraunces, Georgia, serif; font-size: 17px; line-height: 1.25; color: #2b2620; }
+  .cover .fallback { padding: 12px; text-align: center; font-family: Fraunces, Georgia, serif; font-size: 17px; line-height: 1.25; color: #2b2620; overflow: hidden; }
   .cover .fallback small { display: block; font-family: Inter, sans-serif; font-size: 12px; margin-top: 8px; opacity: .7; }
-  .meta { padding: 12px 14px 14px; }
+  .cover-badges { position: absolute; left: 8px; top: 8px; right: 8px; display: flex; gap: 4px; flex-wrap: wrap; }
+  .chip-s { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,.92); color: #3a342d; }
+  .chip-s.finished { background: #2f5d50; color: #fff; }
+  .chip-s.started { background: #f6c66b; color: #3d2706; }
+  .meta { padding: 12px 14px 14px; display: grid; gap: 4px; }
   .meta h3 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .meta p { margin: 4px 0 0; color: var(--ink-2); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .card .remove { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,.92); color: #3a342d; opacity: 0; transition: opacity .15s; }
-  .card:hover .remove, .card:focus-within .remove { opacity: 1; }
-  @media (hover: none) { .card .remove { opacity: 1; } }
+  .meta p { margin: 0; color: var(--ink-2); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  .add-card { border: 1.5px dashed var(--line); background: transparent; box-shadow: none; cursor: pointer; align-items: center; justify-content: center; min-height: 300px; color: var(--ink-2); gap: 12px; text-align: center; padding: 20px; }
+  .add-card { border: 1.5px dashed var(--line); background: transparent; box-shadow: none; align-items: center; justify-content: center; min-height: 300px; color: var(--ink-2); gap: 12px; text-align: center; padding: 20px; }
   .add-card:hover { border-color: var(--accent); color: var(--ink); background: var(--surface); }
   .add-card .plus { width: 52px; height: 52px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
   .add-card strong { color: var(--ink); font-weight: 600; font-size: 16px; }
   .add-card span { font-size: 13px; }
 
-  .empty { grid-column: 1 / -1; text-align: center; color: var(--ink-2); padding: 40px 16px; }
+  /* List */
+  .list { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-bottom: 48px; box-shadow: var(--shadow); }
+  .list-head, .row { display: grid; grid-template-columns: 56px minmax(0, 1fr) 120px 110px; gap: 16px; align-items: center; padding: 10px 16px; }
+  .list-head { font-size: 12px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid var(--line); background: var(--surface-2); }
+  .row { border: 0; border-bottom: 1px solid var(--line); background: transparent; width: 100%; text-align: left; cursor: pointer; }
+  .row:last-child { border-bottom: 0; }
+  .row:hover { background: var(--surface-2); }
+  .row .cover { width: 56px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+  .row .cover .fallback { font-size: 9px; padding: 4px; }
+  .row .cover .fallback small { display: none; }
+  .row .t { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .a { color: var(--ink-2); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .stars-view svg { width: 16px; height: 16px; }
+  .status-pill { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; justify-self: start; }
+  .status-pill.finished { background: var(--accent-soft); color: var(--accent); }
+  .status-pill.started { background: var(--started-soft); color: var(--started); }
+  .status-pill.not-yet { background: var(--surface-2); color: var(--ink-2); }
 
-  /* Dialog */
-  dialog { border: 0; padding: 0; border-radius: 22px; background: var(--surface); color: var(--ink); width: min(520px, calc(100vw - 24px)); max-height: calc(100vh - 24px); box-shadow: 0 24px 60px rgba(0,0,0,.25); }
+  .empty { grid-column: 1 / -1; text-align: center; color: var(--ink-2); padding: 40px 16px; }
+  .empty .btn { margin-top: 12px; }
+
+  /* Dialogs */
+  dialog { border: 0; padding: 0; border-radius: 22px; background: var(--surface); color: var(--ink); width: min(520px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); box-shadow: 0 24px 60px rgba(0,0,0,.25); }
+  dialog.wide { width: min(720px, calc(100vw - 24px)); }
   dialog::backdrop { background: rgba(20,18,15,.45); backdrop-filter: blur(2px); }
   .dlg-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 0; }
   .dlg-head h2 { margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 600; font-size: 22px; }
   .dlg-body { padding: 16px 20px 22px; }
   .hint { color: var(--ink-2); font-size: 14px; margin: 0 0 16px; }
+  .linkish { background: none; border: 0; color: var(--accent); cursor: pointer; padding: 0; text-decoration: underline; text-underline-offset: 3px; font-size: 14px; }
 
   .drop { position: relative; border-radius: 18px; background: #14130f; color: #f3efe8; aspect-ratio: 16 / 10; display: grid; place-items: center; cursor: pointer; overflow: hidden; outline: none; }
   .drop:focus-visible { box-shadow: 0 0 0 3px var(--accent); }
@@ -132,42 +184,70 @@
 
   .or { display: flex; align-items: center; gap: 12px; color: var(--ink-3); font-size: 13px; margin: 18px 0; }
   .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
-
   .field { display: flex; gap: 8px; }
-  .field input { flex: 1; min-width: 0; padding: 11px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); outline: none; letter-spacing: .04em; }
-  .stack { display: grid; gap: 10px; }
-  .stack label { font-size: 13px; color: var(--ink-2); display: grid; gap: 4px; }
-  .stack input { padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); outline: none; }
+  .field input, .edit input[type=text], .edit input[type=date] { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); outline: none; }
+  .center { text-align: center; margin-top: 14px; }
 
   .status { margin-top: 16px; padding: 12px 14px; border-radius: 12px; font-size: 14px; display: none; }
   .status.show { display: block; }
   .status.info { background: var(--surface-2); color: var(--ink-2); }
   .status.error { background: var(--danger-soft); color: var(--danger); }
 
-  .result { display: flex; gap: 16px; align-items: flex-start; }
-  .result .cover { width: 110px; flex: none; border-radius: 10px; box-shadow: var(--shadow); }
-  .result h3 { margin: 0; font-family: Fraunces, Georgia, serif; font-weight: 600; font-size: 22px; line-height: 1.2; }
-  .result .by { color: var(--ink-2); margin: 6px 0 10px; }
-  .result dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 13px; color: var(--ink-2); }
-  .result dt { color: var(--ink-3); }
-  .result dd { margin: 0; }
-  .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
-  .tag { display: inline-block; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 3px 9px; border-radius: 999px; margin-bottom: 10px; }
+  /* Edit form */
+  .edit { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 22px; }
+  .edit-cover { display: grid; gap: 8px; align-content: start; }
+  .edit-cover .cover { border-radius: 12px; box-shadow: var(--shadow); }
+  .edit-cover .btn { width: 100%; }
+  .fields { display: grid; gap: 14px; }
+  .fld { display: grid; gap: 6px; }
+  .fld > span, .fld > label { font-size: 12px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; }
+  .fld input { width: 100%; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .seg { display: flex; background: var(--surface-2); border-radius: 12px; padding: 3px; gap: 3px; }
+  .seg label { flex: 1; position: relative; }
+  .seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .seg span { display: block; text-align: center; padding: 8px 6px; border-radius: 9px; font-size: 14px; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+  .seg input:checked + span { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .stars { display: flex; gap: 2px; align-items: center; }
+  .stars button { border: 0; background: none; padding: 2px; cursor: pointer; color: var(--star-off); border-radius: 6px; }
+  .stars button.on { color: var(--star); }
+  .stars button svg { width: 28px; height: 28px; display: block; }
+  .stars .rlabel { font-size: 13px; color: var(--ink-3); margin-left: 8px; }
+  .tagbox { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 6px; background: var(--surface); }
+  .tagbox:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .tagbox input { border: 0 !important; box-shadow: none !important; padding: 4px 6px !important; flex: 1 1 120px; outline: none; background: transparent; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 500; padding: 3px 4px 3px 10px; border-radius: 999px; }
+  .chip button { border: 0; background: none; color: inherit; cursor: pointer; width: 18px; height: 18px; border-radius: 999px; display: grid; place-items: center; padding: 0; font-size: 14px; line-height: 1; }
+  .chip button:hover { background: rgba(0,0,0,.08); }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 3px 9px; border-radius: 999px; }
   .tag.warn { color: var(--danger); background: var(--danger-soft); }
+  .note { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; font-size: 14px; color: var(--ink-2); }
+  .actions { display: flex; gap: 10px; align-items: center; margin-top: 22px; flex-wrap: wrap; }
+  .actions .spacer { flex: 1; }
+  .edit input:disabled { opacity: .45; cursor: not-allowed; }
 
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-size: 14px; opacity: 0; pointer-events: none; transition: all .2s; z-index: 10; max-width: calc(100vw - 32px); }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
   footer { color: var(--ink-3); font-size: 13px; padding: 0 0 40px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  footer .btn { padding: 6px 12px; font-size: 13px; }
-  [hidden] { display: none !important; }
 
+  @media (max-width: 640px) {
+    .edit { grid-template-columns: 1fr; }
+    .edit-cover { grid-template-columns: 96px 1fr; align-items: end; }
+    .edit-cover .cover { grid-row: span 2; }
+    .list-head { display: none; }
+    .row { grid-template-columns: 48px minmax(0, 1fr); gap: 4px 12px; }
+    .row .cover { width: 48px; grid-row: span 3; }
+    .row .status-pill { grid-column: 2; }
+  }
   @media (max-width: 520px) {
     header { padding-top: 28px; }
     .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .add-card { min-height: 240px; }
-    .result .cover { width: 84px; }
-    .toolbar .btn-primary { flex: 1 1 100%; }
+    .toolbar .btn-primary { flex: 1 1 100%; order: 5; }
+    .two { grid-template-columns: 1fr; }
+    .actions { gap: 6px; }
+    .actions .btn { padding: 10px 14px; }
   }
 </style>
 </head>
@@ -176,107 +256,209 @@
     <header>
       <div class="brand">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Zm0 0A2 2 0 0 0 6 22h13"/><path d="M9 7h6"/></svg>
-        <h1>Personal Book Library</h1>
+        <h1>My Book Library</h1>
       </div>
-      <p class="sub">Snap or upload a photo of a book's barcode. We'll find the title and author and add it to your shelf.</p>
+      <p class="sub">Snap or upload a photo of a book's barcode. We'll find the title, author and cover and add it to your shelf.</p>
     </header>
 
     <div class="toolbar">
       <label class="search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="q" type="search" placeholder="Search by title, author or ISBN" aria-label="Search library">
+        <input id="q" type="search" placeholder="Search title, author, tag, category, ISBN" aria-label="Search library">
       </label>
+      <button class="btn btn-ghost" id="filterBtn" aria-expanded="false" aria-controls="filters">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4"/></svg>
+        Filters <span class="badge-count" id="filterCount" hidden></span>
+      </button>
       <select id="sort" aria-label="Sort books">
         <option value="recent">Recently added</option>
         <option value="title">Title A–Z</option>
         <option value="author">Author A–Z</option>
+        <option value="rating">Highest rated</option>
+        <option value="finished">Recently finished</option>
       </select>
+      <div class="viewtoggle" role="group" aria-label="View">
+        <button id="viewGrid" aria-pressed="true" title="Cover grid">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Grid
+        </button>
+        <button id="viewList" aria-pressed="false" title="List">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>List
+        </button>
+      </div>
       <button class="btn btn-primary" id="openAdd">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         Add a book
       </button>
     </div>
 
-    <div class="stats" id="stats"></div>
-    <main class="grid" id="grid" aria-live="polite"></main>
+    <div class="filters" id="filters" hidden>
+      <label>Category<select id="fCategory"></select></label>
+      <label>Tag<select id="fTag"></select></label>
+      <label>Type<select id="fType"></select></label>
+      <label>Location<select id="fLocation"></select></label>
+      <label>Rating<select id="fRating">
+        <option value="0">Any rating</option>
+        <option value="5">★★★★★ only</option>
+        <option value="4">★★★★ & up</option>
+        <option value="3">★★★ & up</option>
+        <option value="-1">Not rated</option>
+      </select></label>
+      <button class="btn btn-ghost btn-sm clear" id="clearFilters">Clear filters</button>
+    </div>
+
+    <div class="tabs" id="tabs" role="group" aria-label="Reading status"></div>
+    <main id="view" aria-live="polite"></main>
 
     <footer>
       <span>Saved in this browser.</span>
-      <button class="btn btn-ghost" id="exportBtn">Export</button>
-      <button class="btn btn-ghost" id="importBtn">Import</button>
+      <button class="btn btn-ghost btn-sm" id="exportBtn">Export</button>
+      <button class="btn btn-ghost btn-sm" id="importBtn">Import</button>
       <input type="file" id="importFile" accept="application/json" hidden>
       <span>Book data from Open Library and Google Books.</span>
     </footer>
   </div>
 
-  <dialog id="dlg" aria-labelledby="dlgTitle">
+  <!-- Scan dialog -->
+  <dialog id="scanDlg" aria-labelledby="scanTitle">
     <div class="dlg-head">
-      <h2 id="dlgTitle">Scan a barcode</h2>
-      <button class="icon-btn" id="closeDlg" aria-label="Close">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
-      </button>
+      <h2 id="scanTitle">Scan a barcode</h2>
+      <button class="icon-btn" data-close aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-
-    <!-- Step 1: upload barcode or type ISBN -->
-    <section class="dlg-body" id="stepScan">
+    <section class="dlg-body">
       <p class="hint">Use the barcode on the back cover (the one starting with 978 or 979).</p>
       <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload a barcode image">
         <img class="preview" id="preview" alt="" hidden>
         <div class="frame"><i></i>
-          <div class="label" id="dropLabel"><b>Upload barcode photo</b>Click, drop, or paste an image</div>
+          <div class="label" id="dropLabel"></div>
           <div class="scanline"></div>
         </div>
       </div>
       <input type="file" id="file" accept="image/*" hidden>
-
       <div class="or">or enter the ISBN</div>
       <form class="field" id="isbnForm">
         <input id="isbnInput" inputmode="numeric" autocomplete="off" placeholder="978…" aria-label="ISBN">
         <button class="btn btn-accent" type="submit">Look up</button>
       </form>
       <div class="status" id="status" role="status"></div>
+      <div class="center"><button class="linkish" id="addManual" type="button">No barcode? Add a book by hand</button></div>
     </section>
+  </dialog>
 
-    <!-- Step 2: confirm the book -->
-    <section class="dlg-body" id="stepResult" hidden>
-      <div class="result" id="result"></div>
-      <div class="actions">
-        <button class="btn btn-ghost" id="scanAgain">Scan another</button>
-        <button class="btn btn-accent" id="saveBook">Add to library</button>
-      </div>
-    </section>
-
-    <!-- Step 2b: not found, enter details by hand -->
-    <section class="dlg-body" id="stepManual" hidden>
-      <span class="tag warn">Book not found</span>
-      <p class="hint">We read ISBN <b id="manualIsbn"></b> but couldn't find it in the book databases. You can add the details yourself.</p>
-      <form class="stack" id="manualForm">
-        <label>Title<input id="mTitle" required></label>
-        <label>Author<input id="mAuthor"></label>
-        <div class="actions">
-          <button class="btn btn-ghost" type="button" id="manualBack">Try again</button>
-          <button class="btn btn-accent" type="submit">Add to library</button>
+  <!-- Add / edit dialog -->
+  <dialog id="editDlg" class="wide" aria-labelledby="editTitle">
+    <div class="dlg-head">
+      <h2 id="editTitle">Edit book</h2>
+      <button class="icon-btn" data-close aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <form class="dlg-body" id="editForm" novalidate>
+      <div class="note" id="editNote" hidden></div>
+      <div class="edit">
+        <div class="edit-cover">
+          <div class="cover" id="eCover"></div>
+          <button type="button" class="btn btn-ghost btn-sm" id="coverUpload">Change cover</button>
+          <button type="button" class="btn btn-sm btn-danger" id="coverRemove">Remove cover</button>
+          <input type="file" id="coverFile" accept="image/*" hidden>
         </div>
-      </form>
-    </section>
+        <div class="fields">
+          <div class="fld"><label for="eTitle">Title</label><input type="text" id="eTitle" required></div>
+          <div class="fld"><label for="eAuthor">Author</label><input type="text" id="eAuthor" placeholder="Separate several authors with commas"></div>
+
+          <div class="fld"><span id="ratingLbl">Rating</span>
+            <div class="stars" id="eStars" role="group" aria-labelledby="ratingLbl"></div>
+          </div>
+
+          <div class="fld"><span>Reading status</span>
+            <div class="seg" role="radiogroup" aria-label="Reading status">
+              <label><input type="radio" name="status" value="not-yet"><span>Not yet</span></label>
+              <label><input type="radio" name="status" value="started"><span>Started</span></label>
+              <label><input type="radio" name="status" value="finished"><span>Finished</span></label>
+            </div>
+          </div>
+          <div class="two">
+            <div class="fld"><label for="eStart">Start date</label><input type="date" id="eStart"></div>
+            <div class="fld"><label for="eFinish">Finish date</label><input type="date" id="eFinish"></div>
+          </div>
+
+          <div class="fld"><span>Type</span>
+            <div class="seg" role="radiogroup" aria-label="Type">
+              <label><input type="radio" name="type" value="book"><span>Book</span></label>
+              <label><input type="radio" name="type" value="ebook"><span>eBook</span></label>
+              <label><input type="radio" name="type" value="audiobook"><span>Audiobook</span></label>
+            </div>
+          </div>
+
+          <div class="two">
+            <div class="fld"><label for="eCategory">Category</label><input type="text" id="eCategory" list="categoryList" placeholder="e.g. Fiction"></div>
+            <div class="fld"><label for="eLocation">Location</label><input type="text" id="eLocation" list="locationList" placeholder="e.g. Home"></div>
+          </div>
+          <datalist id="categoryList"></datalist>
+          <datalist id="locationList"></datalist>
+          <datalist id="tagList"></datalist>
+
+          <div class="fld"><label for="eTagInput">Tags</label>
+            <div class="tagbox" id="tagBox">
+              <span id="eTags" style="display:contents"></span>
+              <input type="text" id="eTagInput" list="tagList" placeholder="Type a tag, press Enter">
+            </div>
+          </div>
+          <div class="fld"><label for="eIsbn">ISBN</label><input type="text" id="eIsbn" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-danger" id="deleteBook">Delete</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+        <button type="submit" class="btn btn-accent" id="saveBook">Save</button>
+      </div>
+    </form>
   </dialog>
 
   <div class="toast" id="toast" role="status"></div>
 
 <script>
 (() => {
-  const STORE_KEY = 'personal-book-library.v1';
+  const STORE_KEY = 'my-book-library.v1';
+  const OLD_STORE_KEY = 'personal-book-library.v1';
+  const VIEW_KEY = 'my-book-library.view';
   const $ = (id) => document.getElementById(id);
   const tints = ['#e9d8c4', '#d6e2d6', '#dcd6e8', '#f0d9d2', '#d3e1ea', '#ece2c0'];
 
+  const STATUS = { 'not-yet': 'Not yet', started: 'Started', finished: 'Finished' };
+  const TYPES = { book: 'Book', ebook: 'eBook', audiobook: 'Audiobook' };
+  const DEFAULT_CATEGORIES = ['Fiction', 'Non-fiction', 'Mystery & Thriller', 'Sci-Fi & Fantasy', 'Romance', 'Biography & Memoir', 'History', 'Self-help', 'Business', 'Science', 'Children', 'Poetry', 'Cooking'];
+  const DEFAULT_LOCATIONS = ['Home', 'Library', 'Office', 'Borrowed from a friend', 'Lent out'];
+  const STAR = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg>';
+
   // ---------- Storage ----------
-  function loadBooks() {
-    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch { return []; }
+  function withDefaults(b) {
+    return {
+      id: b.id || newId(),
+      isbn: b.isbn || '',
+      title: b.title || 'Untitled',
+      authors: Array.isArray(b.authors) ? b.authors : (b.authors ? [String(b.authors)] : []),
+      cover: b.cover || '',
+      autoCover: b.autoCover !== false, // false once the user removes the cover
+      publisher: b.publisher || '',
+      published: b.published || '',
+      pages: b.pages || '',
+      category: b.category || '',
+      tags: Array.isArray(b.tags) ? b.tags : [],
+      status: STATUS[b.status] ? b.status : 'not-yet',
+      startDate: b.startDate || '',
+      finishDate: b.finishDate || '',
+      type: TYPES[b.type] ? b.type : 'book',
+      location: b.location || '',
+      rating: Math.max(0, Math.min(5, Number(b.rating) || 0)),
+      addedAt: b.addedAt || Date.now(),
+    };
   }
-  let books = loadBooks();
+  function newId() { return (crypto.randomUUID && crypto.randomUUID()) || String(Date.now() + Math.random()); }
+  function read(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } }
+  // Books saved under the old "Personal Book Library" name carry over.
+  let books = (read(STORE_KEY) || read(OLD_STORE_KEY) || []).map(withDefaults);
   function saveBooks() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(books)); }
-    catch { toast('Could not save — browser storage is unavailable.'); }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(books)); return true; }
+    catch { toast('Could not save — browser storage is full or unavailable.'); return false; }
   }
 
   // ---------- ISBN helpers ----------
@@ -295,7 +477,6 @@
     const sum = [...core].reduce((acc, d, i) => acc + Number(d) * (i % 2 ? 3 : 1), 0);
     return core + ((10 - (sum % 10)) % 10);
   }
-  // Returns a 13-digit ISBN or null.
   function normalizeIsbn(raw) {
     const s = String(raw).toUpperCase().replace(/[^0-9X]/g, '');
     if (s.length === 13 && /^97[89]/.test(s) && isValidIsbn13(s)) return s;
@@ -330,7 +511,6 @@
     ctx.drawImage(img, -w / 2, -h / 2, w, h);
     return c;
   }
-
   async function decodeWithNative(img) {
     if (!('BarcodeDetector' in window)) return [];
     try {
@@ -341,7 +521,6 @@
       return found.map(b => b.rawValue);
     } catch { return []; }
   }
-
   function decodeWithZXing(img) {
     if (!window.ZXing) return [];
     const Z = window.ZXing;
@@ -365,7 +544,6 @@
     }
     return [];
   }
-
   async function decodeBarcode(img) {
     const values = [...await decodeWithNative(img)];
     if (!values.some(normalizeIsbn)) values.push(...decodeWithZXing(img));
@@ -389,6 +567,7 @@
       publisher: (b.publishers || []).map(p => p.name).join(', '),
       published: b.publish_date || '',
       pages: b.number_of_pages || '',
+      category: '',
     };
   }
   async function lookupGoogle(isbn) {
@@ -403,100 +582,166 @@
       publisher: v.publisher || '',
       published: v.publishedDate || '',
       pages: v.pageCount || '',
+      category: (v.categories && v.categories[0]) || '',
     };
   }
   async function lookupBook(isbn) {
-    let lastError = null;
-    for (const source of [lookupOpenLibrary, lookupGoogle]) {
-      try {
-        const book = await source(isbn);
-        if (book) {
-          // Fill gaps (e.g. missing author or cover) from the second source.
-          if (source === lookupOpenLibrary && (!book.authors.length || !book.cover)) {
-            try {
-              const g = await lookupGoogle(isbn);
-              if (g) { if (!book.authors.length) book.authors = g.authors; if (!book.cover) book.cover = g.cover; }
-            } catch {}
-          }
-          return book;
-        }
-      } catch (e) { lastError = e; }
+    const [ol, g] = await Promise.allSettled([lookupOpenLibrary(isbn), lookupGoogle(isbn)]);
+    const a = ol.status === 'fulfilled' ? ol.value : null;
+    const b = g.status === 'fulfilled' ? g.value : null;
+    if (!a && !b) {
+      if (ol.status === 'rejected' && g.status === 'rejected') throw new Error('network');
+      return null;
     }
-    if (lastError) throw new Error('network');
-    return null;
+    // Prefer Open Library, fill any gaps from Google Books.
+    const book = { ...(b || {}), ...(a || {}) };
+    for (const k of ['authors', 'cover', 'category', 'publisher', 'published', 'pages']) {
+      const empty = Array.isArray(book[k]) ? !book[k].length : !book[k];
+      if (empty && b && b[k]) book[k] = b[k];
+    }
+    // Open Library's cover service often has a cover even when the book record doesn't.
+    if (!book.cover) book.cover = openLibraryCover(isbn);
+    return book;
   }
+  const openLibraryCover = (isbn) => `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`;
 
-  // ---------- Rendering ----------
+  // ---------- Rendering helpers ----------
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const authorText = (b) => b.authors && b.authors.length ? b.authors.join(', ') : 'Unknown author';
-  function tintFor(s) { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return tints[h % tints.length]; }
+  const tintFor = (s) => { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return tints[h % tints.length]; };
+  const coverSrc = (b) => b.cover || (b.isbn && b.autoCover !== false ? openLibraryCover(b.isbn) : '');
+  const fallbackHtml = (title, author) => `<div class="fallback">${esc(title)}<small>${esc(author)}</small></div>`;
 
-  function coverHtml(b) {
-    const fallback = `<div class="fallback">${esc(b.title)}<small>${esc(authorText(b))}</small></div>`;
-    if (!b.cover) return `<div class="cover" style="background:${tintFor(b.isbn || b.title)}">${fallback}</div>`;
-    return `<div class="cover" style="background:${tintFor(b.isbn || b.title)}"><img src="${esc(b.cover)}" alt="" loading="lazy" data-fallback="1"></div>`;
+  function coverHtml(b, extra = '') {
+    const src = coverSrc(b);
+    const attrs = `class="cover" style="background:${tintFor(b.isbn || b.title)}" data-title="${esc(b.title)}" data-author="${esc(authorText(b))}"`;
+    const inner = src ? `<img src="${esc(src)}" alt="" loading="lazy" data-cover>` : fallbackHtml(b.title, authorText(b));
+    return `<div ${attrs}>${inner}${extra}</div>`;
   }
-  // Swap broken cover images for the text fallback.
-  document.addEventListener('error', (e) => {
-    const img = e.target;
-    if (img.tagName === 'IMG' && img.dataset.fallback) {
-      const card = img.closest('[data-title]');
-      img.parentElement.innerHTML = `<div class="fallback">${esc(card.dataset.title)}<small>${esc(card.dataset.author)}</small></div>`;
-    }
-  }, true);
+  // Swap broken cover images (or 1×1 placeholders) for the text fallback.
+  function coverFailed(img) {
+    const c = img.closest('.cover');
+    if (c) img.replaceWith(Object.assign(document.createElement('div'), { innerHTML: fallbackHtml(c.dataset.title, c.dataset.author) }).firstChild);
+  }
+  document.addEventListener('error', (e) => { if (e.target.matches && e.target.matches('img[data-cover]')) coverFailed(e.target); }, true);
+  document.addEventListener('load', (e) => { const t = e.target; if (t.matches && t.matches('img[data-cover]') && t.naturalWidth < 5) coverFailed(t); }, true);
+
+  function starsView(n) {
+    let out = `<span class="stars-view" role="img" aria-label="${n ? n + ' out of 5 stars' : 'Not rated'}">`;
+    for (let i = 1; i <= 5; i++) out += `<span class="${i <= n ? 'on' : ''}">${STAR}</span>`;
+    return out + '</span>';
+  }
+  function uniq(list) { return [...new Set(list.filter(Boolean))].sort((a, b) => a.localeCompare(b)); }
+  function fmtDate(d) { if (!d) return ''; const dt = new Date(d + 'T00:00:00'); return isNaN(dt) ? d : dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }); }
+
+  // ---------- Library view ----------
+  const state = { status: 'all', view: 'grid' };
+  try { if (localStorage.getItem(VIEW_KEY) === 'list') state.view = 'list'; } catch {}
+
+  function fillSelect(sel, label, values, fmt = (v) => v) {
+    const cur = sel.value;
+    sel.innerHTML = `<option value="">${label}</option>` + values.map(v => `<option value="${esc(v)}">${esc(fmt(v))}</option>`).join('');
+    sel.value = values.includes(cur) ? cur : '';
+  }
+  function refreshOptions() {
+    fillSelect($('fCategory'), 'All categories', uniq(books.map(b => b.category)));
+    fillSelect($('fTag'), 'All tags', uniq(books.flatMap(b => b.tags)));
+    fillSelect($('fType'), 'All types', Object.keys(TYPES), (v) => TYPES[v]);
+    fillSelect($('fLocation'), 'All locations', uniq(books.map(b => b.location)));
+    const opts = (list) => list.map(v => `<option value="${esc(v)}"></option>`).join('');
+    $('categoryList').innerHTML = opts(uniq([...DEFAULT_CATEGORIES, ...books.map(b => b.category)]));
+    $('locationList').innerHTML = opts(uniq([...DEFAULT_LOCATIONS, ...books.map(b => b.location)]));
+    $('tagList').innerHTML = opts(uniq(books.flatMap(b => b.tags)));
+  }
+
+  function activeFilterCount() {
+    return ['fCategory', 'fTag', 'fType', 'fLocation'].filter(id => $(id).value).length + ($('fRating').value !== '0' ? 1 : 0);
+  }
+  function matches(b, ignoreStatus) {
+    const q = $('q').value.trim().toLowerCase();
+    if (q && ![b.title, authorText(b), b.isbn, b.category, b.location, TYPES[b.type], ...b.tags].join(' ').toLowerCase().includes(q)) return false;
+    if (!ignoreStatus && state.status !== 'all' && b.status !== state.status) return false;
+    if ($('fCategory').value && b.category !== $('fCategory').value) return false;
+    if ($('fTag').value && !b.tags.includes($('fTag').value)) return false;
+    if ($('fType').value && b.type !== $('fType').value) return false;
+    if ($('fLocation').value && b.location !== $('fLocation').value) return false;
+    const r = Number($('fRating').value);
+    if (r === -1 && b.rating) return false;
+    if (r > 0 && b.rating < r) return false;
+    return true;
+  }
 
   function render() {
-    const q = $('q').value.trim().toLowerCase();
+    // Status tabs with counts (respecting the other filters).
+    const base = books.filter(b => matches(b, true));
+    const count = (s) => s === 'all' ? base.length : base.filter(b => b.status === s).length;
+    $('tabs').innerHTML = ['all', 'not-yet', 'started', 'finished'].map(s =>
+      `<button data-status="${s}" aria-pressed="${state.status === s}">${s === 'all' ? 'All' : STATUS[s]} <span>${count(s)}</span></button>`).join('');
+
+    const n = activeFilterCount();
+    $('filterCount').hidden = !n; $('filterCount').textContent = n;
+
+    let list = books.filter(b => matches(b));
     const sort = $('sort').value;
-    let list = books.filter(b => !q || [b.title, authorText(b), b.isbn].join(' ').toLowerCase().includes(q));
     if (sort === 'title') list.sort((a, b) => a.title.localeCompare(b.title));
     else if (sort === 'author') list.sort((a, b) => authorText(a).localeCompare(authorText(b)));
+    else if (sort === 'rating') list.sort((a, b) => b.rating - a.rating || a.title.localeCompare(b.title));
+    else if (sort === 'finished') list.sort((a, b) => (b.finishDate || '').localeCompare(a.finishDate || '') || b.addedAt - a.addedAt);
     else list.sort((a, b) => b.addedAt - a.addedAt);
 
-    const authors = new Set(books.flatMap(b => b.authors || []));
-    $('stats').innerHTML = books.length
-      ? `<span class="pill"><b>${books.length}</b> ${books.length === 1 ? 'book' : 'books'}</span><span class="pill"><b>${authors.size}</b> ${authors.size === 1 ? 'author' : 'authors'}</span>`
+    $('viewGrid').setAttribute('aria-pressed', state.view === 'grid');
+    $('viewList').setAttribute('aria-pressed', state.view === 'list');
+
+    const filtering = $('q').value.trim() || n || state.status !== 'all';
+    const emptyMsg = !list.length
+      ? (books.length
+          ? `<div class="empty">No books match your search or filters.<br><button class="btn btn-ghost" data-act="clear-all">Clear search & filters</button></div>`
+          : (state.view === 'list' ? `<div class="empty">Your library is empty.<br><button class="btn btn-accent" data-act="add">Add your first book</button></div>` : ''))
       : '';
 
-    const addCard = `<button class="card add-card" id="addCard" type="button">
-        <div class="plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 5v14M7 5v14M11 5v14M15 5v14M19 5v14" stroke-width="1.8"/></svg></div>
-        <strong>Scan a new book</strong><span>Upload a barcode photo</span>
-      </button>`;
-    const cards = list.map(b => `
-      <article class="card" data-title="${esc(b.title)}" data-author="${esc(authorText(b))}">
-        ${coverHtml(b)}
-        <div class="meta"><h3 title="${esc(b.title)}">${esc(b.title)}</h3><p title="${esc(authorText(b))}">${esc(authorText(b))}</p></div>
-        <button class="icon-btn remove" data-remove="${esc(b.id)}" aria-label="Remove ${esc(b.title)}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>
-        </button>
-      </article>`).join('');
-    const empty = q && !list.length ? `<div class="empty">No books match “${esc(q)}”.</div>` : '';
-    $('grid').innerHTML = (q ? '' : addCard) + cards + empty;
+    if (state.view === 'grid') {
+      const addCard = filtering ? '' : `<button class="card add-card" data-act="add" type="button">
+          <div class="plus"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5v14M7 5v14M11 5v14M15 5v14M19 5v14"/></svg></div>
+          <strong>Scan a new book</strong><span>Upload a barcode photo</span>
+        </button>`;
+      const cards = list.map(b => {
+        const badges = `<div class="cover-badges">${b.status !== 'not-yet' ? `<span class="chip-s ${b.status}">${STATUS[b.status]}</span>` : ''}${b.type !== 'book' ? `<span class="chip-s">${TYPES[b.type]}</span>` : ''}</div>`;
+        return `<button class="card" type="button" data-edit="${esc(b.id)}" aria-label="Edit ${esc(b.title)}">
+          ${coverHtml(b, badges)}
+          <div class="meta"><h3>${esc(b.title)}</h3><p>${esc(authorText(b))}</p>${starsView(b.rating)}</div>
+        </button>`;
+      }).join('');
+      $('view').className = 'grid';
+      $('view').innerHTML = addCard + cards + emptyMsg;
+    } else {
+      $('view').className = list.length ? 'list' : '';
+      $('view').innerHTML = list.length
+        ? `<div class="list-head"><span>Cover</span><span>Book</span><span>Rating</span><span>Status</span></div>` +
+          list.map(b => `<button class="row" type="button" data-edit="${esc(b.id)}" aria-label="Edit ${esc(b.title)}">
+            ${coverHtml(b)}
+            <span style="min-width:0"><div class="t">${esc(b.title)}</div><div class="a">${esc(authorText(b))}</div></span>
+            ${starsView(b.rating)}
+            <span class="status-pill ${b.status}">${STATUS[b.status]}</span>
+          </button>`).join('')
+        : emptyMsg;
+    }
   }
 
-  // ---------- Dialog flow ----------
-  const dlg = $('dlg');
-  let pending = null; // book waiting for confirmation
-
-  function showStep(name) {
-    for (const s of ['stepScan', 'stepResult', 'stepManual']) $(s).hidden = s !== name;
-    $('dlgTitle').textContent = name === 'stepScan' ? 'Scan a barcode' : name === 'stepResult' ? 'Is this your book?' : 'Add details';
-  }
+  // ---------- Scan dialog ----------
+  const scanDlg = $('scanDlg');
   function setStatus(msg, kind = 'info') {
     const el = $('status');
     el.className = 'status' + (msg ? ` show ${kind}` : '');
     el.innerHTML = msg || '';
   }
-  function resetScan() {
+  function openScan() {
     $('preview').hidden = true; $('preview').removeAttribute('src');
     $('drop').classList.remove('busy');
     $('dropLabel').innerHTML = '<b>Upload barcode photo</b>Click, drop, or paste an image';
     $('isbnInput').value = '';
     setStatus('');
-    pending = null;
-    showStep('stepScan');
+    scanDlg.showModal();
   }
-  function openDialog() { resetScan(); dlg.showModal(); }
 
   async function handleImage(file) {
     if (!file || !file.type.startsWith('image/')) { setStatus('Please choose an image file.', 'error'); return; }
@@ -518,65 +763,125 @@
         return;
       }
       $('dropLabel').innerHTML = `<b>ISBN ${isbn}</b>`;
-      await findAndShow(isbn);
+      await findAndEdit(isbn);
     } catch (e) {
       $('drop').classList.remove('busy');
       setStatus(esc(e.message || 'Something went wrong reading that image.'), 'error');
     }
   }
 
-  async function findAndShow(isbn) {
-    const dupe = books.find(b => b.isbn === isbn);
+  async function findAndEdit(isbn) {
+    const existing = books.find(b => b.isbn === isbn);
+    if (existing) { scanDlg.close(); openEdit(existing, { note: '<span class="tag warn">Already in your library</span> You can update its details below.' }); return; }
     setStatus(`Looking up ISBN <b>${isbn}</b>…`);
-    try {
-      const book = await lookupBook(isbn);
-      if (!book) {
-        $('manualIsbn').textContent = isbn;
-        $('mTitle').value = ''; $('mAuthor').value = '';
-        pending = { isbn };
-        showStep('stepManual');
-        $('mTitle').focus();
-        return;
-      }
-      pending = { ...book, isbn };
-      $('result').innerHTML = `
-        ${coverHtml(pending).replace('class="cover"', 'class="cover" data-title="' + esc(pending.title) + '" data-author="' + esc(authorText(pending)) + '"')}
-        <div>
-          ${dupe ? '<span class="tag warn">Already in your library</span>' : '<span class="tag">Found</span>'}
-          <h3>${esc(pending.title)}</h3>
-          <p class="by">by ${esc(authorText(pending))}</p>
-          <dl>
-            <dt>ISBN</dt><dd>${isbn}</dd>
-            ${pending.publisher ? `<dt>Publisher</dt><dd>${esc(pending.publisher)}</dd>` : ''}
-            ${pending.published ? `<dt>Published</dt><dd>${esc(pending.published)}</dd>` : ''}
-            ${pending.pages ? `<dt>Pages</dt><dd>${esc(pending.pages)}</dd>` : ''}
-          </dl>
-        </div>`;
-      $('saveBook').disabled = !!dupe;
-      $('saveBook').textContent = dupe ? 'Already saved' : 'Add to library';
-      showStep('stepResult');
-      if (!dupe) $('saveBook').focus();
-    } catch {
-      setStatus('Could not reach the book databases. Check your internet connection and try again.', 'error');
+    let found;
+    try { found = await lookupBook(isbn); }
+    catch { setStatus('Could not reach the book databases. Check your internet connection and try again.', 'error'); return; }
+    scanDlg.close();
+    if (found) {
+      openEdit(withDefaults({ ...found, isbn, id: '' }), { isNew: true, note: '<span class="tag">Found</span> Check the details, then save.' });
+    } else {
+      openEdit(withDefaults({ isbn, title: '', id: '' }), { isNew: true, note: `<span class="tag warn">Book not found</span> We read ISBN ${isbn} but couldn't find it. Add the details yourself.` });
+      $('eTitle').value = '';
     }
   }
 
-  function addBook(book) {
-    books.push({
-      id: (crypto.randomUUID && crypto.randomUUID()) || String(Date.now() + Math.random()),
-      isbn: book.isbn || '',
-      title: book.title,
-      authors: book.authors || [],
-      cover: book.cover || '',
-      publisher: book.publisher || '',
-      published: book.published || '',
-      pages: book.pages || '',
-      addedAt: Date.now(),
+  // ---------- Edit dialog ----------
+  const editDlg = $('editDlg');
+  let draft = null;    // book being edited
+  let isNew = false;
+
+  function renderStars() {
+    const r = draft.rating;
+    $('eStars').innerHTML = [1, 2, 3, 4, 5].map(i =>
+      `<button type="button" data-star="${i}" class="${i <= r ? 'on' : ''}" aria-label="${i} star${i > 1 ? 's' : ''}" aria-pressed="${i === r}">${STAR}</button>`).join('') +
+      `<span class="rlabel">${r ? r + ' / 5' : 'Not rated'}${r ? ' · <button type="button" class="linkish" data-star="0">clear</button>' : ''}</span>`;
+  }
+  function renderTags() {
+    $('eTags').innerHTML = draft.tags.map((t, i) => `<span class="chip">${esc(t)}<button type="button" data-tag="${i}" aria-label="Remove tag ${esc(t)}">×</button></span>`).join('');
+  }
+  function renderEditCover() {
+    $('eCover').outerHTML = coverHtml({ ...draft, title: $('eTitle').value || draft.title || 'Untitled', authors: draft.authors }).replace('class="cover"', 'class="cover" id="eCover"');
+    $('coverRemove').hidden = !coverSrc(draft);
+  }
+  function syncDates() {
+    const s = editDlg.querySelector('[name=status]:checked').value;
+    $('eStart').disabled = s === 'not-yet';
+    $('eFinish').disabled = s !== 'finished';
+  }
+
+  function openEdit(book, { isNew: fresh = false, note = '' } = {}) {
+    draft = { ...book, tags: [...book.tags], authors: [...book.authors] };
+    isNew = fresh;
+    $('editTitle').textContent = fresh ? 'Add to library' : 'Edit book';
+    $('editNote').hidden = !note; $('editNote').innerHTML = note;
+    $('eTitle').value = draft.title;
+    $('eAuthor').value = draft.authors.join(', ');
+    $('eStart').value = draft.startDate;
+    $('eFinish').value = draft.finishDate;
+    $('eCategory').value = draft.category;
+    $('eLocation').value = draft.location || (fresh ? 'Home' : '');
+    $('eIsbn').value = draft.isbn;
+    $('eTagInput').value = '';
+    editDlg.querySelector(`[name=status][value="${draft.status}"]`).checked = true;
+    editDlg.querySelector(`[name=type][value="${draft.type}"]`).checked = true;
+    $('deleteBook').hidden = fresh;
+    $('saveBook').textContent = fresh ? 'Add to library' : 'Save changes';
+    renderStars(); renderTags(); renderEditCover(); syncDates();
+    editDlg.showModal();
+    $(fresh && !draft.title ? 'eTitle' : 'saveBook').focus();
+  }
+
+  function addTagFromInput() {
+    const input = $('eTagInput');
+    const parts = input.value.split(',').map(s => s.trim()).filter(Boolean);
+    for (const p of parts) if (!draft.tags.some(t => t.toLowerCase() === p.toLowerCase())) draft.tags.push(p);
+    input.value = '';
+    renderTags();
+  }
+
+  // Shrink an uploaded cover so it fits comfortably in browser storage.
+  async function fileToCover(file) {
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await loadImage(url);
+      const scale = Math.min(1, 400 / img.naturalWidth);
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.naturalWidth * scale); c.height = Math.round(img.naturalHeight * scale);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      return c.toDataURL('image/jpeg', 0.82);
+    } finally { URL.revokeObjectURL(url); }
+  }
+
+  function saveDraft(e) {
+    e.preventDefault();
+    addTagFromInput();
+    const title = $('eTitle').value.trim();
+    if (!title) { $('eTitle').focus(); toast('Please enter a title.'); return; }
+    const isbnRaw = $('eIsbn').value.trim();
+    const isbn = isbnRaw ? (normalizeIsbn(isbnRaw) || isbnRaw.replace(/[^0-9X]/gi, '')) : '';
+    const status = editDlg.querySelector('[name=status]:checked').value;
+    const book = withDefaults({
+      ...draft,
+      id: draft.id || newId(),
+      title,
+      authors: $('eAuthor').value.split(',').map(s => s.trim()).filter(Boolean),
+      isbn,
+      status,
+      startDate: status === 'not-yet' ? '' : $('eStart').value,
+      finishDate: status === 'finished' ? $('eFinish').value : '',
+      type: editDlg.querySelector('[name=type]:checked').value,
+      category: $('eCategory').value.trim(),
+      location: $('eLocation').value.trim(),
+      addedAt: draft.addedAt || Date.now(),
     });
-    saveBooks();
-    render();
-    dlg.close();
-    toast(`Added “${book.title}” to your library`);
+    const prev = books;
+    const i = books.findIndex(b => b.id === book.id);
+    books = i >= 0 ? books.map(b => b.id === book.id ? book : b) : [...books, book];
+    if (!saveBooks()) { books = prev; return; }
+    editDlg.close();
+    refreshOptions(); render();
+    toast(isNew ? `Added “${book.title}” to your library` : 'Changes saved');
   }
 
   let toastTimer;
@@ -587,20 +892,23 @@
   }
 
   // ---------- Events ----------
-  $('openAdd').onclick = openDialog;
-  $('grid').addEventListener('click', (e) => {
-    if (e.target.closest('#addCard')) return openDialog();
-    const rm = e.target.closest('[data-remove]');
-    if (rm) {
-      const book = books.find(b => b.id === rm.dataset.remove);
-      if (book && confirm(`Remove “${book.title}” from your library?`)) {
-        books = books.filter(b => b !== book); saveBooks(); render(); toast('Book removed');
-      }
-    }
+  $('openAdd').onclick = openScan;
+  $('view').addEventListener('click', (e) => {
+    const act = e.target.closest('[data-act]');
+    if (act && act.dataset.act === 'add') return openScan();
+    if (act && act.dataset.act === 'clear-all') { $('q').value = ''; clearFilters(); state.status = 'all'; return render(); }
+    const ed = e.target.closest('[data-edit]');
+    if (ed) { const b = books.find(x => x.id === ed.dataset.edit); if (b) openEdit(b); }
   });
-  $('closeDlg').onclick = () => dlg.close();
-  dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  $('tabs').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-status]');
+    if (b) { state.status = b.dataset.status; render(); }
+  });
+  for (const d of [scanDlg, editDlg]) {
+    d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('[data-close]')) d.close(); });
+  }
 
+  // scan
   const drop = $('drop');
   drop.onclick = () => $('file').click();
   drop.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('file').click(); } };
@@ -609,33 +917,80 @@
   drop.addEventListener('dragleave', () => drop.classList.remove('dragging'));
   drop.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove('dragging'); handleImage(e.dataTransfer.files[0]); });
   document.addEventListener('paste', (e) => {
-    if (!dlg.open || $('stepScan').hidden) return;
+    if (!scanDlg.open) return;
     const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
     if (item) handleImage(item.getAsFile());
   });
-
   $('isbnForm').onsubmit = (e) => {
     e.preventDefault();
     const isbn = normalizeIsbn($('isbnInput').value);
     if (!isbn) return setStatus('That doesn\'t look like a valid ISBN. Check the 10 or 13 digits and try again.', 'error');
-    findAndShow(isbn);
+    findAndEdit(isbn);
   };
-  $('scanAgain').onclick = resetScan;
-  $('manualBack').onclick = resetScan;
-  $('saveBook').onclick = () => pending && addBook(pending);
-  $('manualForm').onsubmit = (e) => {
-    e.preventDefault();
-    const author = $('mAuthor').value.trim();
-    addBook({ isbn: pending && pending.isbn, title: $('mTitle').value.trim(), authors: author ? [author] : [] });
+  $('addManual').onclick = () => { scanDlg.close(); openEdit(withDefaults({ title: '', id: '' }), { isNew: true }); $('eTitle').value = ''; };
+
+  // edit
+  $('editForm').onsubmit = saveDraft;
+  $('eStars').addEventListener('click', (e) => {
+    const s = e.target.closest('[data-star]');
+    if (!s) return;
+    const n = Number(s.dataset.star);
+    draft.rating = draft.rating === n ? 0 : n;
+    renderStars();
+    const again = $('eStars').querySelector(`[data-star="${draft.rating || 1}"]`); if (again) again.focus();
+  });
+  editDlg.querySelectorAll('[name=status]').forEach(r => r.addEventListener('change', () => {
+    const today = new Date().toISOString().slice(0, 10);
+    if (r.value !== 'not-yet' && !$('eStart').value) $('eStart').value = today;
+    if (r.value === 'finished' && !$('eFinish').value) $('eFinish').value = today;
+    syncDates();
+  }));
+  $('eTagInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTagFromInput(); }
+    else if (e.key === 'Backspace' && !e.target.value && draft.tags.length) { draft.tags.pop(); renderTags(); }
+  });
+  $('eTagInput').addEventListener('blur', addTagFromInput);
+  $('eTags').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-tag]');
+    if (b) { draft.tags.splice(Number(b.dataset.tag), 1); renderTags(); $('eTagInput').focus(); }
+  });
+  $('tagBox').addEventListener('click', (e) => { if (e.target === $('tagBox')) $('eTagInput').focus(); });
+  $('eTitle').addEventListener('input', () => { if (!coverSrc(draft)) renderEditCover(); });
+  $('coverUpload').onclick = () => $('coverFile').click();
+  $('coverFile').onchange = async (e) => {
+    const f = e.target.files[0]; e.target.value = '';
+    if (!f) return;
+    try { draft.cover = await fileToCover(f); draft.autoCover = true; renderEditCover(); }
+    catch { toast('That file could not be used as a cover.'); }
+  };
+  $('coverRemove').onclick = () => { draft.cover = ''; draft.autoCover = false; renderEditCover(); };
+  $('deleteBook').onclick = () => {
+    if (!confirm(`Delete “${draft.title}” from your library?`)) return;
+    books = books.filter(b => b.id !== draft.id);
+    saveBooks(); editDlg.close(); refreshOptions(); render(); toast('Book deleted');
   };
 
+  // toolbar
   $('q').oninput = render;
   $('sort').onchange = render;
+  $('filterBtn').onclick = () => {
+    const open = $('filters').hidden;
+    $('filters').hidden = !open;
+    $('filterBtn').setAttribute('aria-expanded', open);
+    $('filterBtn').classList.toggle('on', open);
+  };
+  for (const id of ['fCategory', 'fTag', 'fType', 'fLocation', 'fRating']) $(id).onchange = render;
+  function clearFilters() { for (const id of ['fCategory', 'fTag', 'fType', 'fLocation']) $(id).value = ''; $('fRating').value = '0'; }
+  $('clearFilters').onclick = () => { clearFilters(); render(); };
+  function setView(v) { state.view = v; try { localStorage.setItem(VIEW_KEY, v); } catch {} render(); }
+  $('viewGrid').onclick = () => setView('grid');
+  $('viewList').onclick = () => setView('list');
 
+  // export / import
   $('exportBtn').onclick = () => {
     const blob = new Blob([JSON.stringify(books, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = 'personal-book-library.json'; a.click();
+    a.href = URL.createObjectURL(blob); a.download = 'my-book-library.json'; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
   $('importBtn').onclick = () => $('importFile').click();
@@ -646,13 +1001,13 @@
       const incoming = JSON.parse(await file.text());
       if (!Array.isArray(incoming)) throw new Error();
       const known = new Set(books.map(b => b.isbn || b.title));
-      const fresh = incoming.filter(b => b && b.title && !known.has(b.isbn || b.title))
-        .map(b => ({ ...b, id: b.id || String(Date.now() + Math.random()), addedAt: b.addedAt || Date.now(), authors: b.authors || [] }));
-      books.push(...fresh); saveBooks(); render();
+      const fresh = incoming.filter(b => b && b.title && !known.has(b.isbn || b.title)).map(withDefaults);
+      books.push(...fresh); saveBooks(); refreshOptions(); render();
       toast(`Imported ${fresh.length} ${fresh.length === 1 ? 'book' : 'books'}`);
     } catch { toast('That file isn\'t a library export.'); }
   };
 
+  refreshOptions();
   render();
 })();
 </script>
