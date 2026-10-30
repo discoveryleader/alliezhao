@@ -776,7 +776,13 @@
     setStatus(`Looking up ISBN <b>${isbn}</b>…`);
     let found;
     try { found = await lookupBook(isbn); }
-    catch { setStatus('Could not reach the book databases. Check your internet connection and try again.', 'error'); return; }
+    catch {
+      // Offline or lookups blocked: keep the ISBN and let the user fill in the rest.
+      scanDlg.close();
+      openEdit(withDefaults({ isbn, title: '', id: '' }), { isNew: true, note: `<span class="tag warn">Lookup unavailable</span> We read ISBN ${isbn} but couldn't reach the book databases. Enter the title and author yourself.` });
+      $('eTitle').value = '';
+      return;
+    }
     scanDlg.close();
     if (found) {
       openEdit(withDefaults({ ...found, isbn, id: '' }), { isNew: true, note: '<span class="tag">Found</span> Check the details, then save.' });
@@ -964,11 +970,19 @@
     catch { toast('That file could not be used as a cover.'); }
   };
   $('coverRemove').onclick = () => { draft.cover = ''; draft.autoCover = false; renderEditCover(); };
+  let deleteArmed = 0;
+  function disarmDelete() { clearTimeout(deleteArmed); deleteArmed = 0; $('deleteBook').textContent = 'Delete'; }
   $('deleteBook').onclick = () => {
-    if (!confirm(`Delete “${draft.title}” from your library?`)) return;
+    if (!deleteArmed) {
+      $('deleteBook').textContent = 'Tap again to delete';
+      deleteArmed = setTimeout(disarmDelete, 4000);
+      return;
+    }
+    disarmDelete();
     books = books.filter(b => b.id !== draft.id);
     saveBooks(); editDlg.close(); refreshOptions(); render(); toast('Book deleted');
   };
+  editDlg.addEventListener('close', disarmDelete);
 
   // toolbar
   $('q').oninput = render;
@@ -987,8 +1001,17 @@
   $('viewList').onclick = () => setView('list');
 
   // export / import
-  $('exportBtn').onclick = () => {
-    const blob = new Blob([JSON.stringify(books, null, 2)], { type: 'application/json' });
+  $('exportBtn').onclick = async () => {
+    const json = JSON.stringify(books, null, 2);
+    try {
+      const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
+      if (dl) {
+        await dl.save({ filename: 'my-book-library.json', data: json });
+        toast('Library exported');
+        return;
+      }
+    } catch (e) { if (e && e.code === 'declined') return; }
+    const blob = new Blob([json], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = 'my-book-library.json'; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
