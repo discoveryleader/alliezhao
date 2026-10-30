@@ -1,0 +1,1937 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Storytelling as a Designer</title>
+<style>
+/* Nocturne — design-system tokens and component classes. This file is the source of truth for the system's look; retune it here and see readme.md. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --color-bg: #161826;
+  --color-surface: #232532;
+  --color-text: #e9e9ed;
+  --color-accent: #9184d9; /* review round 7 (Barron): the accent moves to
+     the product's blurple — OKLCH hue 289.2, the hue of the app's own Pro
+     accent (#9a8fe0, --om-accent-pro) — at the same lightness the steel
+     accent held (L 0.660, so the documented ratios survive) and chroma
+     in the product blurple's own range (its token sits at C 0.118; the
+     accent takes 0.125, from the old steel's 0.030):
+     the accent now reads as an accent rather than another neutral. */
+  --color-accent-2: #a7a1db; /* the machine-derived stand-in follows: same
+     hue, same L 0.734, chroma at the same 2:3 proportion it held */
+  --color-divider: color-mix(in srgb, #e9e9ed 16%, transparent);
+
+  /* Tonal ramps — generated in OKLCH on one shared lightness scale, so the
+     same step of any role matches the others in visual value. */
+  --color-neutral-100: #f3f5fe;
+  --color-neutral-200: #e4e7f5;
+  --color-neutral-300: #cfd3e5;
+  --color-neutral-400: #b2b6ca;
+  --color-neutral-500: #9397ab;
+  --color-neutral-600: #75798c;
+  --color-neutral-700: #595d6c;
+  --color-neutral-800: #3f424d;
+  --color-neutral-900: #292b31;
+
+  --color-accent-100: #f5f4ff;
+  --color-accent-200: #e7e5fe;
+  --color-accent-300: #d2cefd;
+  --color-accent-400: #b5abfc;
+  --color-accent-500: #968ae0;
+  --color-accent-600: #796cbf;
+  --color-accent-700: #5d5294;
+  --color-accent-800: #423a6a;
+  --color-accent-900: #2b2741;
+
+  --color-accent-2-100: #f5f4ff;
+  --color-accent-2-200: #e7e5fe;
+  --color-accent-2-300: #d2cefd;
+  --color-accent-2-400: #b5afe8;
+  --color-accent-2-500: #9690c9;
+  --color-accent-2-600: #7972a9;
+  --color-accent-2-700: #5c5783;
+  --color-accent-2-800: #423e5d;
+  --color-accent-2-900: #2b293a;
+
+  /* Deck section-divider ground — review round 3: saturation as presence.
+     Dividers take a saturated deep indigo (hue 277, the neutral ramp's own
+     family; C 0.094 — written when the accent held C 0.030, before the
+     round-7 blurple raised it past the ground's) with a lighter bloom and
+     a ghost tint of the same hue, while the slide grounds stay
+     desaturated. Deck-scale fills only — not interface colors. */
+  --color-section: #262a60;
+  --color-section-glow: #353b80;
+  --color-section-ghost: #4c5397;
+
+  --font-heading: "Inter", system-ui, sans-serif;
+  --font-heading-weight: 500;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  --space-1: 2.8px;
+  --space-2: 5.6px;
+  --space-3: 8.4px;
+  --space-4: 11.2px;
+  --space-6: 16.8px;
+  --space-8: 22.4px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  /* Elevation — derived from the ground: soft ink-tinted shadows on a
+     light theme, a hairline edge + ambient darkness on a dark one. */
+  --shadow-sm: 0 0 0 1px #3f424d;
+  --shadow-md: 0 0 0 1px #595d6c, 0 6px 18px rgba(0,0,0,0.55);
+  --shadow-lg: 0 0 0 1px #9397ab, 0 16px 40px rgba(0,0,0,0.65);
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); }
+
+.lighten{mix-blend-mode:lighten;background-color:transparent}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Components — built with the tokens above. Plain CSS
+   on plain HTML: no JavaScript, no build step. Each class is documented in
+   readme.md and demonstrated in foundations/ and components/.
+   ══════════════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-size: 15px; line-height: 1.55; font-weight: 400; }
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  line-height: 1.12; letter-spacing: -0.015em; margin: 0 0 var(--space-2);
+}
+h1 { font-size: 42px; }
+h2 { font-size: 32px; }
+h3 { font-size: 25px; }
+h4 { font-size: 20px; }
+h5 { font-size: 16px; }
+h6 { font-size: 13px; }
+h6 { letter-spacing: 0.08em; text-transform: uppercase; }
+p { margin: 0 0 var(--space-3); }
+a { color: var(--color-accent); text-underline-offset: 3px; }
+img { display: block; max-width: 100%; }
+figure { margin: 0; }
+figcaption {
+  font-size: 11px; margin-top: var(--space-1);
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+.text-muted { color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+::selection { background: color-mix(in srgb, var(--color-accent) 30%, transparent); }
+
+/* — rules — */
+/* Rules fade to transparent at both ends instead of stopping cleanly — a
+   Nocturne signature. The ramp is 48px an end (one deck baseline unit),
+   painted from the same divider token. Freestanding rules fade; box
+   outlines, in-control separators, and short accent marks stay solid. */
+.hr {
+  height: 1px; border: 0; margin: var(--space-4) 0;
+  background: linear-gradient(to right,
+    transparent, var(--color-divider) 48px,
+    var(--color-divider) calc(100% - 48px), transparent);
+}
+
+/* — buttons — */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer; text-decoration: none;
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 14px; line-height: 1.2; color: var(--color-text); /* matches the .input's 14px —
+     the pair sits side by side in sign-up rows */
+  background: transparent; border: 1px solid transparent;
+  padding: var(--space-2) calc(var(--space-3) * 1.2);
+  border-radius: var(--radius-md);
+}
+.btn svg { display: block; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary { color: var(--color-accent); border-color: var(--color-accent); }
+.btn-primary:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.btn-primary:active { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
+.btn-secondary { border-color: var(--color-divider); }
+.btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+.btn-secondary:active { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
+.btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); }
+.btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
+.btn-ghost:active { background: color-mix(in srgb, var(--color-accent) 18%, transparent); }
+.btn-icon { width: 36px; height: 36px; padding: 0; }
+.btn-block { width: 100%; margin-top: var(--space-2); }
+
+/* — forms — */
+.field > label {
+  display: block; font-size: 12px; margin-bottom: 5px;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+}
+.input {
+  width: 100%; min-height: 36px; padding: 6px 10px; font: inherit;
+  font-size: 14px; color: var(--color-text); caret-color: var(--color-accent);
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+}
+.input:hover { border-color: color-mix(in srgb, var(--color-text) 45%, transparent); }
+.input:focus-visible { border-color: var(--color-accent); outline-offset: 0; }
+textarea.input { min-height: 90px; resize: vertical; }
+.radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
+.radio input, .seg-opt input {
+  position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;
+}
+.radio .dot {
+  width: 16px; height: 16px; flex: none; border-radius: 50%;
+  border: 1.5px solid var(--color-divider);
+}
+.radio:hover .dot { border-color: var(--color-accent); }
+.radio input:checked + .dot {
+  border-color: var(--color-accent); background: var(--color-accent);
+  box-shadow: inset 0 0 0 4px var(--color-bg);
+}
+.radio input:focus-visible + .dot { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.seg {
+  display: inline-flex; overflow: hidden;
+  border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+}
+.seg-opt {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px; font-size: 13px; cursor: pointer;
+}
+.seg-opt + .seg-opt { border-left: 1px solid var(--color-divider); }
+.seg-opt:has(input:checked) { color: var(--color-accent); box-shadow: inset 0 0 0 1px var(--color-accent); }
+.seg-opt:not(:has(input:checked)):hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+.seg-opt:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+
+/* — cards — */
+.card {
+  display: flex; flex-direction: column; gap: var(--space-2);
+  padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface);
+}
+.card-kicker { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent); }
+.card-title {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 17px; line-height: 1.2;
+}
+.card-body { margin: 0; font-size: 13px; opacity: 0.8; flex: 1; }
+.card-meta {
+  display: flex; align-items: center; gap: 6px; font-size: 11px;
+  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+}
+.elev-sm { box-shadow: var(--shadow-sm); }
+.elev-md { box-shadow: var(--shadow-md); }
+.elev-lg { box-shadow: var(--shadow-lg); }
+
+/* — tags — */
+.tag {
+  display: inline-flex; align-items: center; font-size: 11px;
+  letter-spacing: 0.02em; padding: 3px 10px;
+  border-radius: calc(var(--radius-md) * 0.75);
+}
+.tag-accent { background: var(--color-accent-800); color: var(--color-accent-100); }
+.tag-accent-2 { background: var(--color-accent-2-800); color: var(--color-accent-2-100); }
+.tag-neutral { background: var(--color-neutral-800); color: var(--color-neutral-100); }
+.tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
+
+/* — navigation — */
+.nav {
+  display: flex; align-items: center; gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: none;
+}
+.nav-brand {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 18px; margin-right: auto;
+}
+.nav a { color: inherit; text-decoration: none; font-size: 14px; }
+.nav a:hover, .nav a[aria-current='page'] { color: var(--color-accent); }
+
+/* — tables — */
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table th {
+  text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  padding: var(--space-2); border-bottom: 1px solid transparent; /* keeps layout; the row paints the fading rule */
+}
+.table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid transparent;
+}
+/* Row rules as row-level strips so the end-fade spans the row, not each cell. */
+.table thead tr {
+  background: linear-gradient(to right,
+    transparent, var(--color-divider) 48px,
+    var(--color-divider) calc(100% - 48px), transparent) no-repeat bottom / 100% 1px;
+}
+.table tbody tr {
+  background: linear-gradient(to right,
+    transparent, color-mix(in srgb, var(--color-text) 8%, transparent) 48px,
+    color-mix(in srgb, var(--color-text) 8%, transparent) calc(100% - 48px), transparent) no-repeat bottom / 100% 1px;
+}
+.table tbody tr:hover {
+  /* the hover tint layers over the row rule, which keeps painting */
+  background:
+    linear-gradient(color-mix(in srgb, var(--color-text) 4%, transparent),
+                    color-mix(in srgb, var(--color-text) 4%, transparent)) no-repeat 0 0 / 100% 100%,
+    linear-gradient(to right,
+      transparent, color-mix(in srgb, var(--color-text) 8%, transparent) 48px,
+      color-mix(in srgb, var(--color-text) 8%, transparent) calc(100% - 48px), transparent) no-repeat bottom / 100% 1px;
+}
+
+/* — dialog — */
+.dialog-backdrop {
+  position: fixed; inset: 0; display: grid; place-items: center;
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--color-neutral-900) 50%, transparent);
+}
+.dialog {
+  width: min(440px, 100%); display: flex; flex-direction: column; gap: var(--space-3);
+  padding: var(--space-4); border-radius: var(--radius-lg);
+  background: var(--color-surface); box-shadow: var(--shadow-lg);
+}
+.dialog-title {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 20px;
+}
+.dialog-body { font-size: 14px; opacity: 0.85; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
+
+
+</style>
+<style>
+/* Page styles from the design. Generated from "Storytelling Practice.dc.html" by tools/sync-design.mjs; re-syncing overwrites this file. */
+
+:root{--color-bg:#f4f3ee; --color-surface:#fbfaf6; --color-text:#1e2129; --color-accent:#4f6d9a; --color-accent-2:#4f6d9a; --color-divider:color-mix(in srgb,#1e2129 14%,transparent);
+--color-neutral-100:#1e2129; --color-neutral-200:#2d313a; --color-neutral-300:#484d58; --color-neutral-400:#565c67; --color-neutral-500:#666c78; --color-neutral-600:#9a9fa8; --color-neutral-700:#c7cad0; --color-neutral-800:#dfe0e0; --color-neutral-900:#eae9e4;
+--color-accent-100:#16233a; --color-accent-200:#233655; --color-accent-300:#334c74; --color-accent-400:#405c86; --color-accent-500:#4f6d9a; --color-accent-600:#7290b8; --color-accent-700:#9db3d1; --color-accent-800:#c8d5e6; --color-accent-900:#e4ebf3;
+--color-section:#233655;
+--shadow-sm:0 1px 2px rgba(30,33,41,.08); --shadow-md:0 4px 14px rgba(30,33,41,.12); --shadow-lg:0 12px 32px rgba(30,33,41,.16);}
+
+</style>
+<style>
+:root { color-scheme: light; }
+</style>
+<style>
+/* Narrow screens. The design is laid out for desktop; below 880px these rules
+   stack its two-column screens and let long lines wrap instead of overlapping.
+   Hand-written, so tools/sync-design.mjs leaves this file alone. */
+@media (max-width: 880px) {
+  #app header.nav { flex-wrap: wrap; gap: var(--space-3); padding: var(--space-4) !important; }
+  #app header.nav .nav-brand { font-size: 18px !important; }
+  #app header.nav .seg { width: 100%; }
+  #app header.nav .seg-opt { flex: 1 1 auto; white-space: nowrap; justify-content: center; padding: 8px !important; font-size: 13px !important; }
+  #app main { padding: var(--space-2) var(--space-4) 64px !important; }
+  #app h2 { font-size: 26px; }
+
+  /* Today, Reader, Story Bank: one column, with the sidebar back in the flow */
+  #app section[data-screen-label] { grid-template-columns: minmax(0, 1fr) !important; gap: var(--space-6) !important; }
+  #app section[data-screen-label] > aside { position: static !important; order: 0 !important; }
+  #app section[data-screen-label="Today"] > div > div:first-child { flex-wrap: wrap; }
+
+  /* Step cards stay three across: icon above a smaller label, no description */
+  #app div[style*="font-size: 24px; font-weight: 500"] { font-size: 15px !important; }
+  #app div[style*="gap:10px; align-items:flex-start; padding:var(--space-2) var(--space-3)"] { flex-direction: column; gap: 6px !important; }
+  #app div[style*="gap:10px; align-items:flex-start; padding:var(--space-2) var(--space-3)"] div[style*="line-height:1.4"] { display: none; }
+
+  /* Beat cards: prompts wrap; Space-bar hints give way to the Record button */
+  #app .card-title { white-space: normal !important; }
+  #app .card[data-beat] > div:last-child { flex-wrap: wrap; }
+  #app .card[data-beat] > div:last-child > span[style*="margin-left:auto"] { display: none; }
+  #app .card[data-beat] > div:last-child > button:last-child { margin-left: auto; }
+  #app div[style*="padding-left:calc(36px"] { padding-left: 0 !important; flex-wrap: wrap; }
+  #app .card.elev-md { margin-left: 0 !important; }
+
+  /* Story Bank cards: date, project and score badge wrap */
+  #app .card.elev-sm > div:first-child { white-space: normal !important; flex-wrap: wrap; }
+
+  /* Compression Ladder: thread cards and rungs stack */
+  #app div[style*="grid-template-columns:repeat(3, minmax(0,1fr)); gap:var(--space-3)"],
+  #app div[style*="grid-template-columns:minmax(0,1fr) 300px"] { grid-template-columns: minmax(0, 1fr) !important; }
+}
+
+</style>
+<style>
+/* Shared-link (Artifact) build only. The color scheme is written in by
+   tools/build-artifact.mjs, from the design's own background color. */
+
+#artifact-notice {
+  position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); z-index: 10;
+  max-width: calc(100vw - 32px); padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--shadow-md);
+  color: var(--color-text); font-size: 13px; text-align: center;
+}
+#artifact-notice[hidden] { display: none; }
+
+</style>
+<div id="app"></div>
+<template id="app-template">
+<div style="min-height:100vh; display:flex; flex-direction:column; color:var(--color-text); font-family:var(--font-body);">
+  <header class="nav" style="max-width:1160px; width:100%; margin:0 auto; padding:var(--space-4) var(--space-6);">
+    <div class="nav-brand" style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 24px; font-weight: 400; color: var(--color-neutral-400); letter-spacing: 0.02em" onClick="{{ goToday }}">
+      <svg width="32" height="32" viewBox="0 0 32 32" style="flex:none;" aria-label="Three Beats logo">
+        <rect width="32" height="32" rx="8" fill="var(--color-surface)"></rect>
+        <rect x="8" y="8.5" width="6" height="3" rx="1.5" fill="var(--color-neutral-400)"></rect>
+        <rect x="8" y="14.5" width="11" height="3" rx="1.5" fill="var(--color-neutral-200)"></rect>
+        <rect x="8" y="20.5" width="16" height="3" rx="1.5" fill="var(--color-accent)" style="filter:drop-shadow(0 0 4px var(--color-accent));"></rect>
+      </svg>
+      Storytelling as a Designer
+    </div>
+    <nav aria-label="Sections" class="seg" style="display:flex; gap:2px; align-items:center; padding:3px;">
+      <button class="seg-opt" onClick="{{ goToday }}" aria-current="{{ curToday }}" style="cursor:pointer; padding:7px 16px; font-size:14px; font-weight:500; color:{{ navTodayColor }}; background:{{ navTodayBg }}; box-shadow:{{ navTodayRing }}; border-radius:var(--radius-sm);" style-hover="background: var(--color-neutral-800)">Today</button>
+      <button class="seg-opt" onClick="{{ goBank }}" aria-current="{{ curBank }}" style="cursor:pointer; padding:7px 16px; font-size:14px; font-weight:500; color:{{ navBankColor }}; background:{{ navBankBg }}; box-shadow:{{ navBankRing }}; border-radius:var(--radius-sm);" style-hover="background: var(--color-neutral-800)">Story Bank</button>
+      <button class="seg-opt" onClick="{{ goLadder }}" aria-current="{{ curLadder }}" style="cursor:pointer; padding:7px 16px; font-size:14px; font-weight:500; color:{{ navLadderColor }}; background:{{ navLadderBg }}; box-shadow:{{ navLadderRing }}; border-radius:var(--radius-sm);" style-hover="background: var(--color-neutral-800)">Compression Ladder</button>
+    </nav>
+  </header>
+
+  <main style="max-width:1160px; width:100%; margin:0 auto; padding:var(--space-4) var(--space-6) 80px; flex:1;">
+
+    <!-- ═══ TODAY ═══ -->
+    <sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+    <section data-screen-label="Today" style="display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:var(--space-8); align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:var(--space-6);">
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:var(--space-4);">
+          <div>
+            <h6 style="color:var(--color-accent); margin-bottom:6px; white-space:nowrap;">Three Beats · the daily rep</h6>
+            <h2 style="margin:0;">{{ todayLabel }}</h2>
+          </div>
+          <sc-if value="{{ showStreak }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; gap:var(--space-6); font-size:13px; color:var(--color-neutral-300); white-space:nowrap;">
+            <div><span style="font-size:22px; color:var(--color-text); font-family:var(--font-heading); font-weight:500; margin-right:6px;">{{ streak }}</span>day streak</div>
+            <div><span style="font-size:22px; color:var(--color-text); font-family:var(--font-heading); font-weight:500; margin-right:6px;">{{ repCount }}</span>reps</div>
+          </div>
+          </sc-if>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px var(--space-2);">
+          <sc-for list="{{ steps }}" as="st" hint-placeholder-count="3">
+          <div style="display:flex; gap:10px; align-items:flex-start; padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); background:{{ st.bg }}; box-shadow:{{ st.ring }}; opacity:{{ st.opacity }};">
+            <span style="width:32px; height:32px; border-radius:var(--radius-sm); flex:none; display:grid; place-items:center; background:{{ st.dotBg }}; color:{{ st.dotColor }};">
+              <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="{{ st.icon }}"></path></svg>
+            </span>
+            <div><div style="font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:{{ st.accent }}; margin-bottom:2px;">Step {{ st.n }}</div><div style="font-size: 24px; font-weight: 500">{{ st.label }}</div><div style="font-size:11px; color:var(--color-neutral-500); line-height:1.4;">{{ st.sub }}</div></div>
+          </div>
+          </sc-for>
+          <sc-for list="{{ progressSegs }}" as="sg" hint-placeholder-count="3">
+          <div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ sg.pct }}" style="height:4px; border-radius:2px; background:{{ sg.track }}; overflow:hidden; margin-top:-2px;"><div style="height:100%; width:{{ sg.pct }}%; background:{{ sg.color }}; box-shadow:0 0 8px {{ sg.color }}; transition:width .3s ease;"></div></div>
+          </sc-for>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; font-size:12px; margin-top:calc(-1 * var(--space-4));">
+          <span style="color:var(--color-neutral-400);">Progress · today’s rep</span>
+          <span style="color:{{ progressColor }}; font-family:var(--font-heading); font-weight:500; font-size:14px;">{{ progressLabel }}</span>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); font-size:12px; color:var(--color-neutral-500);">
+          <span>{{ draftStatus }}</span>
+          <div style="display:flex; gap:var(--space-2); align-items:center;">
+            <button role="switch" aria-checked="{{ keepAudioOn }}" onClick="{{ toggleKeepAudio }}" style="display:inline-flex; align-items:center; gap:10px; padding:6px 12px 6px 8px; border-radius:999px; cursor:pointer; font:inherit; font-size:13px; font-weight:600; background:{{ keepAudioBg }}; color:{{ keepAudioColor }}; border:1px solid {{ keepAudioBorder }}; white-space:nowrap;">
+              <span title="{{ keepAudioTitle }}" style="width:34px; height:20px; border-radius:999px; background:{{ keepAudioTrack }}; position:relative; flex:none; transition:background .15s;"><span style="position:absolute; top:2px; left:{{ keepAudioKnob }}px; width:16px; height:16px; border-radius:50%; background:var(--color-surface); box-shadow:var(--shadow-sm); transition:left .15s;"></span></span>
+              <svg width="15" height="15" viewBox="0 0 256 256" fill="currentColor"><path d="M56 96v64a8 8 0 0 1-16 0V96a8 8 0 0 1 16 0Zm32-48v160a8 8 0 0 1-16 0V48a8 8 0 0 1 16 0Zm40 24v112a8 8 0 0 1-16 0V72a8 8 0 0 1 16 0Zm40 32v48a8 8 0 0 1-16 0v-48a8 8 0 0 1 16 0Zm40-16v80a8 8 0 0 1-16 0V88a8 8 0 0 1 16 0Z"></path></svg>
+              {{ keepAudioLabel }}
+            </button>
+            <button class="btn btn-ghost" onClick="{{ demoFill }}" style="font-size:12px;">Fill with a sample day</button>
+            <sc-if value="{{ hasDraft }}" hint-placeholder-val="{{ false }}"><button class="btn btn-ghost" onClick="{{ clearDraft }}" style="font-size:12px; color:var(--color-neutral-500);">Clear draft</button></sc-if>
+          </div>
+        </div>
+
+        <sc-if value="{{ micNotice }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; gap:10px; align-items:flex-start; padding:var(--space-3) var(--space-4); border-radius:var(--radius-md); background:var(--color-neutral-900); font-size:13px; color:var(--color-neutral-300);">
+          <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" style="flex:none; margin-top:2px;"><path d="M128 24a104 104 0 1 0 104 104A104.1 104.1 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Zm-8-80V80a8 8 0 0 1 16 0v56a8 8 0 0 1-16 0Zm20 36a12 12 0 1 1-12-12a12 12 0 0 1 12 12Z"></path></svg>
+          <span>{{ micNotice }}</span>
+        </div>
+        </sc-if>
+
+        <div style="display:flex; flex-direction:column;">
+          <sc-for list="{{ beats }}" as="b" hint-placeholder-count="3">
+          <div style="display:grid; grid-template-columns:36px minmax(0,1fr); gap:var(--space-4);">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:6px; padding-top:var(--space-3);">
+              <div style="width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-size:11px; letter-spacing:0.06em; font-family:var(--font-heading); font-weight:500; border:1px solid {{ b.railColor }}; color:{{ b.railColor }}; background:var(--color-bg);">{{ b.n }}</div>
+              <div style="flex:1; width:1px; background:linear-gradient(to bottom, {{ b.railColor }}, transparent);"></div>
+            </div>
+            <div class="card" style="gap:var(--space-3); padding:var(--space-4); margin-bottom:var(--space-4); box-shadow:{{ b.ring }}; transition:box-shadow .15s;" onClick="{{ b.onFocus }}" data-beat="{{ b.key }}">
+              <div style="display:flex; justify-content:space-between; align-items:baseline; gap:var(--space-4);">
+                <div>
+                  <div class="card-kicker">{{ b.label }}</div>
+                  <div class="card-title" style="font-size:19px; margin-top:4px; white-space:nowrap;">{{ b.prompt }}</div>
+                </div>
+                <div style="font-size:11px; color:var(--color-neutral-400); white-space:nowrap; display:flex; gap:10px;">
+                  <span>{{ b.timer }}</span><span>{{ b.wordLabel }}</span><span style="color:{{ b.stateColor }};">{{ b.stateLabel }}</span>
+                </div>
+              </div>
+              <p class="card-body" style="color:var(--color-neutral-400); margin:0;">{{ b.hint }}</p>
+              <textarea class="input" placeholder="Speak it, or type it." value="{{ b.value }}" onChange="{{ b.onChange }}" onFocus="{{ b.onFocus }}" style="min-height:96px;"></textarea>
+              <sc-if value="{{ b.showInterim }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:13px; font-style:italic; color:var(--color-neutral-500); min-height:18px;">{{ b.interim }}</div>
+              </sc-if>
+              <sc-if value="{{ b.hasClip }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; align-items:center; gap:var(--space-3); padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); background:var(--color-neutral-900);">
+                <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" style="flex:none; color:var(--color-accent);"><path d="M56 96v64a8 8 0 0 1-16 0V96a8 8 0 0 1 16 0Zm32-48v160a8 8 0 0 1-16 0V48a8 8 0 0 1 16 0Zm40 24v112a8 8 0 0 1-16 0V72a8 8 0 0 1 16 0Zm40 32v48a8 8 0 0 1-16 0v-48a8 8 0 0 1 16 0Zm40-16v80a8 8 0 0 1-16 0V88a8 8 0 0 1 16 0Z"></path></svg>
+                <audio controls="{{ true }}" preload="metadata" src="{{ b.clipUrl }}" style="flex:1; height:32px; min-width:0;"></audio>
+                <span style="font-size:11px; color:var(--color-neutral-400); white-space:nowrap;">saved with the entry</span>
+                <button class="btn btn-icon btn-ghost" onClick="{{ b.deleteClip }}" aria-label="Delete recording" style="width:26px; height:26px; padding:0; color:var(--color-neutral-400); flex:none;" style-hover="color: var(--color-text)">
+                  <svg width="13" height="13" viewBox="0 0 256 256" fill="currentColor"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16ZM96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0Zm48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0Z"></path></svg>
+                </button>
+              </div>
+              </sc-if>
+              <div style="display:flex; align-items:center; gap:var(--space-4);">
+                <sc-if value="{{ b.filled }}" hint-placeholder-val="{{ false }}">
+                <button class="btn btn-ghost" onClick="{{ b.onClear }}" disabled="{{ b.isRecording }}" style="color:var(--color-neutral-500); font-size:13px;">Clear</button>
+                </sc-if>
+                <sc-if value="{{ b.isRecording }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="width:8px; height:8px; border-radius:50%; background:var(--color-accent-400); box-shadow:0 0 10px var(--color-accent);"></span>
+                  <div style="width:72px; height:4px; border-radius:2px; background:var(--color-neutral-800); overflow:hidden;"><div style="height:100%; width:{{ level }}%; background:var(--color-accent); transition:width .08s linear;"></div></div>
+                  <span style="font-size:11px; color:var(--color-neutral-500);">listening</span>
+                </div>
+                </sc-if>
+                <span style="margin-left:auto; font-size:11px; color:var(--color-neutral-400); white-space:nowrap;">{{ b.spaceHint }}</span>
+                <button class="btn" onClick="{{ b.onRecord }}" disabled="{{ b.disabled }}" style="min-width:132px; height:44px; padding:0 20px; font-size:15px; font-weight:500; background:{{ b.btnBg }}; color:{{ b.btnColor }}; border:1px solid {{ b.btnBg }}; box-shadow:0 2px 12px rgba(30,33,41,0.18);" style-hover="filter: brightness(0.92)">
+                  <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M128 176a48 48 0 0 0 48-48V64a48 48 0 0 0-96 0v64a48 48 0 0 0 48 48Zm-32-112a32 32 0 0 1 64 0v64a32 32 0 0 1-64 0Zm40 143.6V232a8 8 0 0 1-16 0v-24.4A80.1 80.1 0 0 1 48 128a8 8 0 0 1 16 0a64 64 0 0 0 128 0a8 8 0 0 1 16 0a80.1 80.1 0 0 1-72 79.6Z"/></svg>
+                  {{ b.recLabel }}
+                </button>
+              </div>
+            </div>
+          </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ notTitling }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:var(--space-4); padding-left:calc(36px + var(--space-4));">
+          <button class="btn" onClick="{{ beginClose }}" style="height:52px; padding:0 28px; font-size:16px; font-weight:600; border-radius:var(--radius-md); background:var(--color-accent); color:#f4f3ee; border:1px solid var(--color-accent-400); box-shadow:{{ saveGlow }}; white-space:nowrap; flex:none; display:inline-flex; align-items:center; gap:10px;" style-hover="background: var(--color-accent-400)">
+            <svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M219.3 80l-43.3-43.3A15.9 15.9 0 0 0 164.7 32H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V91.3a15.9 15.9 0 0 0-4.7-11.3ZM168 208H88v-56h80Zm40 0h-24v-56a16 16 0 0 0-16-16H88a16 16 0 0 0-16 16v56H48V48h116.7L208 91.3Zm-48-136a8 8 0 0 1-8 8h-48a8 8 0 0 1 0-16h48a8 8 0 0 1 8 8Z"></path></svg>
+            Save today’s entry
+          </button>
+          <span style="font-size:13px; color:{{ gateColor }};">{{ gateLabel }}</span>
+        </div>
+        </sc-if>
+        <sc-if value="{{ titling }}" hint-placeholder-val="{{ false }}">
+        <div class="card elev-md" style="margin-left:calc(36px + var(--space-4)); padding:var(--space-4); gap:var(--space-3);">
+          <div class="card-kicker" style="color:oklch(0.47 0.09 165);">Title it</div>
+          <div style="font-size:13px; color:var(--color-neutral-400);">A title is a compression exercise. Claude drafts one; yours wins.</div>
+          <div class="field"><label>{{ titleStatus }}</label><input class="input" value="{{ title }}" onChange="{{ onTitle }}" style="font-size:16px;"></div>
+          <div class="field"><label>Project (optional — threads this entry in the Bank)</label><input class="input" list="sad-projects" value="{{ project }}" onChange="{{ onProject }}" placeholder="e.g. Checkout redesign"><datalist id="sad-projects"><sc-for list="{{ projectNames }}" as="p" hint-placeholder-count="0"><option value="{{ p }}"></option></sc-for></datalist></div>
+          <div style="display:flex; gap:var(--space-2);"><button class="btn btn-primary" onClick="{{ saveEntry }}">Save to the shelf</button><button class="btn btn-ghost" onClick="{{ cancelClose }}">Back</button></div>
+        </div>
+        </sc-if>
+      </div>
+
+      <!-- shelf -->
+      <aside style="display:flex; flex-direction:column; gap:var(--space-3); position:sticky; top:var(--space-4);" data-comment-anchor="bf7288c419-aside">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:var(--space-2);">
+          <h5 style="margin:0;">Shelf</h5>
+          <div style="display:flex; align-items:center; gap:var(--space-2);">
+            <span style="font-size:12px; color:var(--color-neutral-400);">{{ entryCountLabel }}</span>
+            <button class="btn btn-icon btn-ghost" onClick="{{ toggleShelfSearch }}" aria-label="Search the shelf" style="width:30px; height:30px; padding:0; color:{{ shelfSearchColor }};">
+              <svg width="15" height="15" viewBox="0 0 256 256" fill="currentColor"><path d="M229.7 218.3l-43.3-43.3a92.2 92.2 0 1 0-11.3 11.3l43.3 43.3a8 8 0 0 0 11.3-11.3ZM40 112a72 72 0 1 1 72 72a72.1 72.1 0 0 1-72-72Z"></path></svg>
+            </button>
+          </div>
+        </div>
+        <sc-if value="{{ shelfSearchOpen }}" hint-placeholder-val="{{ false }}">
+        <input class="input" placeholder="Search the shelf" value="{{ shelfQuery }}" onChange="{{ onShelfQuery }}" autoFocus="{{ true }}" style="font-size:13px;">
+        </sc-if>
+        <div style="display:flex; align-items:center; gap:var(--space-2);">
+          <span style="font-size:11px; color:var(--color-neutral-500);">Order</span>
+          <div class="seg" style="padding:2px;">
+            <button class="seg-opt" onClick="{{ shelfNewest }}" style="cursor:pointer; padding:4px 10px; font-size:12px; border-radius:var(--radius-sm); color:{{ shelfNewestColor }}; background:{{ shelfNewestBg }}; font-weight:{{ shelfNewestWeight }};">Newest</button>
+            <button class="seg-opt" onClick="{{ shelfOldest }}" style="cursor:pointer; padding:4px 10px; font-size:12px; border-radius:var(--radius-sm); color:{{ shelfOldestColor }}; background:{{ shelfOldestBg }}; font-weight:{{ shelfOldestWeight }};">Oldest</button>
+          </div>
+        </div>
+        <sc-if value="{{ movementLabel }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:12px; color:var(--color-neutral-400); padding:var(--space-2) 0;">{{ movementLabel }}</div>
+        </sc-if>
+        <div style="display:flex; flex-direction:column; gap:var(--space-2);">
+          <sc-for list="{{ shelf }}" as="e" hint-placeholder-count="4">
+          <div class="card" onClick="{{ e.open }}" style="cursor:pointer; gap:6px; padding:var(--space-3) var(--space-4);" style-hover="background: var(--color-neutral-900)">
+            <div style="display:flex; justify-content:space-between; gap:8px; font-size:11px; color:var(--color-neutral-400);"><span style="white-space:nowrap;">{{ e.dateLabel }}</span><span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ e.project }}</span></div>
+            <div style="font-family:var(--font-heading); font-weight:500; font-size:{{ e.titleSize }}px; line-height:1.25; color:{{ e.titleColor }};">{{ e.title }}</div>
+            <div style="font-size:{{ e.bodySize }}px; line-height:1.45; color:{{ e.bodyColor }}; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">{{ e.snippet }}</div>
+          </div>
+          </sc-for>
+          <sc-if value="{{ shelfEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:13px; color:var(--color-neutral-500); padding:var(--space-3) 0;">No entries match “{{ shelfQuery }}”.</div>
+          </sc-if>
+        </div>
+      </aside>
+    </section>
+    </sc-if>
+
+    <!-- ═══ READER ═══ -->
+    <sc-if value="{{ isReader }}" hint-placeholder-val="{{ false }}">
+    <section data-screen-label="Reader" style="display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:var(--space-8); align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:var(--space-6);">
+        <button class="btn btn-ghost" onClick="{{ backFromReader }}" style="align-self:flex-start;">← Back</button>
+        <sc-if value="{{ readerJustSaved }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px var(--space-2);">
+          <sc-for list="{{ steps }}" as="st" hint-placeholder-count="3">
+          <div style="display:flex; gap:10px; align-items:flex-start; padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); background:{{ st.bg }}; box-shadow:{{ st.ring }}; opacity:{{ st.opacity }};">
+            <span style="width:32px; height:32px; border-radius:var(--radius-sm); flex:none; display:grid; place-items:center; background:{{ st.dotBg }}; color:{{ st.dotColor }};">
+              <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="{{ st.icon }}"></path></svg>
+            </span>
+            <div><div style="font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:{{ st.accent }}; margin-bottom:2px;">Step {{ st.n }}</div><div style="font-size:16px; font-weight:500;">{{ st.label }}</div><div style="font-size:11px; color:var(--color-neutral-500); line-height:1.4;">{{ st.sub }}</div></div>
+          </div>
+          </sc-for>
+          <sc-for list="{{ progressSegs }}" as="sg" hint-placeholder-count="3">
+          <div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ sg.pct }}" style="height:4px; border-radius:2px; background:{{ sg.track }}; overflow:hidden; margin-top:-2px;"><div style="height:100%; width:{{ sg.pct }}%; background:{{ sg.color }}; box-shadow:0 0 8px {{ sg.color }};"></div></div>
+          </sc-for>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; font-size:13px; color:oklch(0.52 0.12 65);">
+          <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M229.7 77.7l-128 128a8 8 0 0 1-11.4 0l-56-56a8 8 0 0 1 11.4-11.4L96 188.7L218.3 66.3a8 8 0 0 1 11.4 11.4Z"></path></svg>
+          Saved — it’s on the shelf. Score it, raid it in the Bank, or retell it on the Ladder.
+        </div>
+        </sc-if>
+        <div>
+          <div style="font-size:12px; color:var(--color-neutral-400); margin-bottom:6px;">{{ reader.meta }}</div>
+          <sc-if value="{{ readerEditing }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; gap:var(--space-2); align-items:center;">
+            <input class="input" value="{{ readerTitleDraft }}" onChange="{{ onReaderTitle }}" onKeyDown="{{ onReaderTitleKey }}" autoFocus="{{ true }}" style="font-family:var(--font-heading); font-size:28px; font-weight:500; flex:1; padding:6px 10px;">
+            <button class="btn btn-primary" onClick="{{ saveReaderTitle }}">Save</button>
+            <button class="btn btn-ghost" onClick="{{ cancelReaderTitle }}">Cancel</button>
+          </div>
+          </sc-if>
+          <sc-if value="{{ readerNotEditing }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; gap:var(--space-3); align-items:flex-start;">
+            <h2 style="margin:0; flex:1; text-wrap:pretty;">{{ reader.title }}</h2>
+            <button class="btn btn-icon btn-ghost" onClick="{{ startReaderTitle }}" aria-label="Edit title" style="width:34px; height:34px; padding:0; flex:none; color:var(--color-neutral-400); margin-top:4px;" style-hover="color: var(--color-text)">
+              <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M227.3 73.4l-44.7-44.7a16 16 0 0 0-22.6 0L36.7 152a15.9 15.9 0 0 0-4.7 11.3V208a16 16 0 0 0 16 16h44.7a15.9 15.9 0 0 0 11.3-4.7L227.3 96a16 16 0 0 0 0-22.6ZM92.7 208H48v-44.7l88-88L180.7 120ZM192 108.7L147.3 64l24-24L216 84.7Z"></path></svg>
+            </button>
+          </div>
+          </sc-if>
+        </div>
+        <div style="display:flex; align-items:center; gap:var(--space-4); padding:var(--space-3) var(--space-4); border-radius:var(--radius-md); background:{{ voiceBg }}; border:1px solid {{ voiceBorder }}; margin-left:calc(36px + var(--space-4)); flex-wrap:wrap;">
+          <sc-if value="{{ reader.hasAnyClip }}" hint-placeholder-val="{{ false }}">
+          <button class="btn" onClick="{{ replayAll }}" style="height:48px; padding:0 22px; font-size:15px; font-weight:600; border-radius:var(--radius-md); background:var(--color-accent); color:#f4f3ee; border:1px solid var(--color-accent-400); display:inline-flex; align-items:center; gap:10px; white-space:nowrap; box-shadow:0 0 20px color-mix(in srgb, var(--color-accent) 40%, transparent);" style-hover="background: var(--color-accent-400)">
+            <sc-if value="{{ replayIdle }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M232.4 114.5L88.3 26.4a16 16 0 0 0-16.2-.3A15.9 15.9 0 0 0 64 40v176a15.9 15.9 0 0 0 8.1 13.9a16 16 0 0 0 16.2-.3l144.1-88.1a15.9 15.9 0 0 0 0-27ZM80 215.9V40l144 88Z"></path></svg></sc-if>
+            <sc-if value="{{ replayPlaying }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M200 32h-36a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h36a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16Zm0 176h-36V48h36ZM92 32H56a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h36a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16Zm0 176H56V48h36Z"></path></svg></sc-if>
+            {{ replayLabel }}
+          </button>
+          <span style="font-size:13px; color:var(--color-neutral-400);">{{ voiceMeta }}</span>
+          </sc-if>
+          <sc-if value="{{ reader.noClip }}" hint-placeholder-val="{{ true }}">
+          <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" style="color:var(--color-neutral-400); flex:none;"><path d="M213.9 210.6l-160-176a8 8 0 0 0-11.8 10.8l22.3 24.5A48 48 0 0 0 80 128a48 48 0 0 0 76.3 38.8l11 12.1A63.9 63.9 0 0 1 64 128a8 8 0 0 0-16 0a80.1 80.1 0 0 0 72 79.6V232a8 8 0 0 0 16 0v-24.4a79.3 79.3 0 0 0 42.2-16.6l24 26.4a8 8 0 1 0 11.8-10.8ZM128 160a32 32 0 0 1-32-32v-12.1l49.4 54.3A32 32 0 0 1 128 160Zm-24-93.4V64a24 24 0 0 1 48 0v60.5a8 8 0 0 0 16 0V64a40 40 0 0 0-79.5-6.3a8 8 0 0 0 15.5 8.9ZM200 128a71.8 71.8 0 0 1-2.4 18.5a8 8 0 1 0 15.5 4A87.6 87.6 0 0 0 216 128a8 8 0 0 0-16 0Z"></path></svg>
+          <span style="font-size:13px; color:var(--color-neutral-300);"><strong style="color:var(--color-text);">No voice recording for this entry.</strong> {{ voiceHint }}</span>
+          </sc-if>
+        </div>
+        <sc-for list="{{ reader.fields }}" as="f" hint-placeholder-count="3">
+        <div style="display:grid; grid-template-columns:36px minmax(0,1fr); gap:var(--space-4);">
+          <div style="font-size:11px; letter-spacing:0.1em; color:var(--color-accent); padding-top:4px;">{{ f.n }}</div>
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-400); margin-bottom:6px;">
+              <span>{{ f.label }}</span>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span>{{ f.meta }}</span>
+                <sc-if value="{{ f.notEditing }}" hint-placeholder-val="{{ true }}">
+                <button class="btn btn-icon btn-ghost" onClick="{{ f.start }}" aria-label="Edit {{ f.label }}" style="width:26px; height:26px; padding:0; color:var(--color-neutral-400);" style-hover="color: var(--color-text)">
+                  <svg width="13" height="13" viewBox="0 0 256 256" fill="currentColor"><path d="M227.3 73.4l-44.7-44.7a16 16 0 0 0-22.6 0L36.7 152a15.9 15.9 0 0 0-4.7 11.3V208a16 16 0 0 0 16 16h44.7a15.9 15.9 0 0 0 11.3-4.7L227.3 96a16 16 0 0 0 0-22.6ZM92.7 208H48v-44.7l88-88L180.7 120ZM192 108.7L147.3 64l24-24L216 84.7Z"></path></svg>
+                </button>
+                </sc-if>
+              </div>
+            </div>
+            <sc-if value="{{ f.notEditing }}" hint-placeholder-val="{{ true }}">
+            <p style="font-size:16px; line-height:1.6; margin:0; max-width:62ch; text-wrap:pretty;">{{ f.text }}</p>
+            <sc-if value="{{ f.hasClip }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:var(--space-3); margin-top:var(--space-3); padding:var(--space-2) var(--space-3); border-radius:var(--radius-md); background:var(--color-neutral-900); max-width:62ch;">
+              <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor" style="flex:none; color:var(--color-accent);"><path d="M56 96v64a8 8 0 0 1-16 0V96a8 8 0 0 1 16 0Zm32-48v160a8 8 0 0 1-16 0V48a8 8 0 0 1 16 0Zm40 24v112a8 8 0 0 1-16 0V72a8 8 0 0 1 16 0Zm40 32v48a8 8 0 0 1-16 0v-48a8 8 0 0 1 16 0Zm40-16v80a8 8 0 0 1-16 0V88a8 8 0 0 1 16 0Z"></path></svg>
+              <audio controls="{{ true }}" preload="metadata" src="{{ f.clipUrl }}" style="flex:1; height:32px; min-width:0;"></audio>
+              <span style="font-size:11px; color:var(--color-neutral-400); white-space:nowrap; text-transform:none; letter-spacing:0;">{{ f.clipMeta }}</span>
+              <button class="btn btn-icon btn-ghost" onClick="{{ f.deleteClip }}" aria-label="Delete recording" style="width:26px; height:26px; padding:0; color:var(--color-neutral-400); flex:none;" style-hover="color: var(--color-text)">
+                <svg width="13" height="13" viewBox="0 0 256 256" fill="currentColor"><path d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16ZM96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0Zm48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0Z"></path></svg>
+              </button>
+            </div>
+            </sc-if>
+            </sc-if>
+            <sc-if value="{{ f.editing }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-direction:column; gap:var(--space-2); max-width:62ch;">
+              <textarea class="input" value="{{ f.draft }}" onChange="{{ f.onChange }}" autoFocus="{{ true }}" style="min-height:120px; font-size:15px;"></textarea>
+              <div style="display:flex; gap:var(--space-2);"><button class="btn btn-primary" onClick="{{ f.save }}">Save</button><button class="btn btn-ghost" onClick="{{ f.cancel }}">Cancel</button></div>
+            </div>
+            </sc-if>
+          </div>
+        </div>
+        </sc-for>
+        <sc-if value="{{ hasVersions }}" hint-placeholder-val="{{ false }}">
+        <div style="padding-left:calc(36px + var(--space-4)); display:flex; flex-direction:column; gap:var(--space-3);">
+          <div style="display:flex; align-items:center; gap:var(--space-3); flex-wrap:wrap;">
+            <div class="card-kicker" style="display:inline-flex; align-items:center; gap:7px;">
+              <svg width="15" height="15" viewBox="0 0 256 256" fill="currentColor" style="color:var(--color-accent);"><path d="M136 80v43.5l37.7 22.3a8 8 0 0 1-8.2 13.8l-41.6-24.6A8 8 0 0 1 120 128V80a8 8 0 0 1 16 0Zm-8-56a104.2 104.2 0 0 0-72 28.8V32a8 8 0 0 0-16 0v40a8 8 0 0 0 8 8h40a8 8 0 0 0 0-16H67.8A88 88 0 1 1 40 128a8 8 0 0 0-16 0a104 104 0 1 0 104-104Z"></path></svg>
+              Versions · {{ versionCount }}
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button onClick="{{ selectCurrent }}" style="font:inherit; font-size:12px; padding:5px 10px; border-radius:999px; cursor:pointer; white-space:nowrap; border:1px solid {{ currentChip.border }}; background:{{ currentChip.bg }}; color:{{ currentChip.color }}; font-weight:{{ currentChip.weight }};">Current</button>
+              <sc-for list="{{ versions }}" as="v" hint-placeholder-count="2">
+              <button onClick="{{ v.select }}" style="font:inherit; font-size:12px; padding:5px 10px; border-radius:999px; cursor:pointer; white-space:nowrap; border:1px solid {{ v.border }}; background:{{ v.bg }}; color:{{ v.color }}; font-weight:{{ v.weight }};">{{ v.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <sc-if value="{{ comparing }}" hint-placeholder-val="{{ false }}">
+          <div class="card" style="padding:var(--space-4); gap:var(--space-4);">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:var(--space-3); flex-wrap:wrap;">
+              <div style="font-size:13px; color:var(--color-neutral-400);">Comparing <strong style="color:var(--color-text);">{{ compareLabel }}</strong> with the current version · <span style="background:oklch(0.92 0.05 25); color:oklch(0.35 0.1 25); padding:1px 5px; border-radius:3px; text-decoration:line-through;">removed</span> <span style="background:var(--color-accent-900); color:var(--color-accent-200); padding:1px 5px; border-radius:3px;">added</span></div>
+              <div style="display:flex; gap:var(--space-2);">
+                <button class="btn btn-secondary" onClick="{{ restoreVersion }}" style="font-size:13px; white-space:nowrap;">Restore this version</button>
+                <button class="btn btn-ghost" onClick="{{ selectCurrent }}" style="font-size:13px;">Close</button>
+              </div>
+            </div>
+            <div style="border:1px solid var(--color-divider); border-radius:var(--radius-md); padding:var(--space-3) var(--space-4); display:flex; flex-direction:column; gap:var(--space-3);">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:var(--space-3); flex-wrap:wrap;">
+                <div class="card-kicker" style="display:inline-flex; align-items:center; gap:7px;">
+                  <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor" style="color:var(--color-accent);"><path d="M216 40H40a16 16 0 0 0-16 16v144a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm0 160H40V56h176ZM90.3 130.3a8 8 0 0 1 11.4-11.4L112 129.4l34.3-34.3a8 8 0 0 1 11.4 11.4l-40 40a8 8 0 0 1-11.4 0ZM184 168a8 8 0 0 1-8 8H80a8 8 0 0 1 0-16h96a8 8 0 0 1 8 8Z"></path></svg>
+                  Rubric · {{ compareLabel }} → current
+                </div>
+                <span style="font-size:12px; color:var(--color-neutral-400);">{{ rubricSum }}</span>
+              </div>
+              <div style="display:grid; grid-template-columns:minmax(0,1fr) auto 28px auto; gap:8px var(--space-3); align-items:center; font-size:13px;">
+                <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-400);">Axis</span>
+                <div style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
+                  <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-400);">Version</span>
+                  <sc-if value="{{ oldUnscored }}" hint-placeholder-val="{{ false }}"><button class="btn" onClick="{{ scoreOld }}" disabled="{{ scoringOld }}" style="font-size:12px; font-weight:600; padding:4px 10px; height:28px; white-space:nowrap; background:var(--color-accent); color:#f4f3ee; border:1px solid var(--color-accent);">{{ scoreOldLabel }}</button></sc-if>
+                </div>
+                <span></span>
+                <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-400); text-align:right;">Current</span>
+                <sc-for list="{{ rubricRows }}" as="r" hint-placeholder-count="6">
+                <span>{{ r.name }}</span>
+                <div style="display:flex; align-items:center; gap:8px; justify-content:flex-end;"><span style="font-size:12px; color:var(--color-neutral-400); min-width:24px; text-align:right;">{{ r.oldVal }}</span><div style="display:flex; gap:4px;"><sc-for list="{{ r.oldDots }}" as="d" hint-placeholder-count="5"><span style="width:9px; height:9px; border-radius:50%; background:{{ d.bg }};"></span></sc-for></div></div>
+                <span style="text-align:center; font-weight:600; font-size:12px; color:{{ r.deltaColor }};">{{ r.delta }}</span>
+                <div style="display:flex; align-items:center; gap:8px; justify-content:flex-end;"><div style="display:flex; gap:4px;"><sc-for list="{{ r.newDots }}" as="d" hint-placeholder-count="5"><span style="width:9px; height:9px; border-radius:50%; background:{{ d.bg }};"></span></sc-for></div><span style="font-size:12px; color:var(--color-text); min-width:24px; text-align:right;">{{ r.newVal }}</span></div>
+                </sc-for>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:var(--space-4); font-size:12px; line-height:1.5;">
+                <div>
+                  <sc-if value="{{ oldUnscored }}" hint-placeholder-val="{{ false }}"><div style="color:var(--color-neutral-400);">This version was never scored — use “Score this version” above to rate it with the same rubric.</div></sc-if>
+                  <sc-if value="{{ oldNote }}" hint-placeholder-val="{{ false }}"><div style="color:var(--color-neutral-400);"><span style="font-size:10px; letter-spacing:0.08em; text-transform:uppercase;">Version note · </span>{{ oldNote }}</div></sc-if>
+                </div>
+                <div>
+                  <sc-if value="{{ newUnscored }}" hint-placeholder-val="{{ false }}"><button class="btn btn-secondary" onClick="{{ scoreEntry }}" disabled="{{ scoring }}" style="font-size:12px; white-space:nowrap;">{{ scoreNewLabel }}</button></sc-if>
+                  <sc-if value="{{ newStale }}" hint-placeholder-val="{{ false }}"><div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;"><span style="color:oklch(0.52 0.12 65); font-weight:600;">Current score predates your edit.</span><button class="btn btn-secondary" onClick="{{ scoreEntry }}" disabled="{{ scoring }}" style="font-size:12px; white-space:nowrap;">{{ scoreNewLabel }}</button></div></sc-if>
+                  <sc-if value="{{ newNote }}" hint-placeholder-val="{{ false }}"><div style="color:var(--color-accent-300);"><span style="font-size:10px; letter-spacing:0.08em; text-transform:uppercase;">Current note · </span>{{ newNote }}</div></sc-if>
+                </div>
+              </div>
+            </div>
+            <sc-if value="{{ compareTitleChanged }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-400); margin-bottom:6px;">Title</div>
+              <div style="font-family:var(--font-heading); font-size:18px; font-weight:500; line-height:1.4;"><sc-for list="{{ compareTitleTokens }}" as="tk" hint-placeholder-count="0"><span style="background:{{ tk.bg }}; color:{{ tk.color }}; text-decoration:{{ tk.deco }}; border-radius:3px;">{{ tk.text }}</span></sc-for></div>
+            </div>
+            </sc-if>
+            <sc-for list="{{ compareFields }}" as="cf" hint-placeholder-count="3">
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-400); margin-bottom:6px;"><span>{{ cf.label }}</span><span>{{ cf.summary }}</span></div>
+              <p style="font-size:15px; line-height:1.7; margin:0; max-width:70ch; text-wrap:pretty;"><sc-for list="{{ cf.tokens }}" as="tk" hint-placeholder-count="0"><span style="background:{{ tk.bg }}; color:{{ tk.color }}; text-decoration:{{ tk.deco }}; border-radius:3px;">{{ tk.text }}</span></sc-for></p>
+            </div>
+            </sc-for>
+          </div>
+          </sc-if>
+        </div>
+        </sc-if>
+        <div style="display:flex; gap:var(--space-2); flex-wrap:wrap; padding-left:calc(36px + var(--space-4));">
+          <button class="btn btn-primary" onClick="{{ readerToLadder }}" style="white-space:nowrap;">Retell on the Ladder</button>
+          <button class="btn btn-secondary" onClick="{{ copyEntry }}">Copy</button>
+          <button class="btn btn-secondary" onClick="{{ exportEntry }}">Export .md</button>
+          <button class="btn btn-ghost" onClick="{{ deleteEntry }}" style="color:var(--color-neutral-500);">Delete</button>
+        </div>
+      </div>
+      <aside class="card" style="padding:var(--space-4); gap:var(--space-3); position:sticky; top:var(--space-4);">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="card-kicker" style="display:inline-flex; align-items:center; gap:7px;">
+            <svg width="15" height="15" viewBox="0 0 256 256" fill="currentColor" style="color:var(--color-accent);"><path d="M216 40H40a16 16 0 0 0-16 16v144a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm0 160H40V56h176ZM90.3 130.3a8 8 0 0 1 11.4-11.4L112 129.4l34.3-34.3a8 8 0 0 1 11.4 11.4l-40 40a8 8 0 0 1-11.4 0ZM184 168a8 8 0 0 1-8 8H80a8 8 0 0 1 0-16h96a8 8 0 0 1 8 8Z"></path></svg>
+            Rubric
+          </div>
+          <span style="font-size:11px; color:var(--color-neutral-400);">{{ reader.scoreSource }}</span>
+        </div>
+        <sc-if value="{{ newStale }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:12px; line-height:1.4; color:oklch(0.52 0.12 65); font-weight:600;">Scored before your latest edit — re-score to see the change.</div>
+        </sc-if>
+        <sc-if value="{{ reader.hasScores }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; flex-direction:column; gap:var(--space-3);">
+          <sc-for list="{{ reader.axes }}" as="a" hint-placeholder-count="6">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px;">
+              <span>{{ a.name }}</span>
+              <div style="display:flex; gap:4px;"><sc-for list="{{ a.dots }}" as="d" hint-placeholder-count="5"><span style="width:9px; height:9px; border-radius:50%; background:{{ d.bg }};"></span></sc-for></div>
+            </div>
+            <div style="font-size:11px; color:var(--color-neutral-500); margin-top:2px;">{{ a.q }}</div>
+          </div>
+          </sc-for>
+          <sc-if value="{{ reader.note }}" hint-placeholder-val="{{ false }}">
+          <div style="border-top:1px solid var(--color-divider); padding-top:var(--space-3); display:flex; flex-direction:column; gap:6px;">
+            <div class="card-kicker" style="color:var(--color-accent); display:inline-flex; align-items:center; gap:7px;">
+              <svg width="15" height="15" viewBox="0 0 256 256" fill="currentColor"><path d="M176 232a8 8 0 0 1-8 8H88a8 8 0 0 1 0-16h80a8 8 0 0 1 8 8Zm40-128a87.6 87.6 0 0 1-33.6 69.2A16.2 16.2 0 0 0 176 186v6a16 16 0 0 1-16 16H96a16 16 0 0 1-16-16v-6a16.2 16.2 0 0 0-6.2-12.7A87.8 87.8 0 0 1 40 104.5C39.7 56.8 78.3 17 126 16a88 88 0 0 1 90 88Zm-16 0a72 72 0 0 0-73.7-72c-39 .8-70.6 33.4-70.3 72.4a71.6 71.6 0 0 0 27.6 56.3A32 32 0 0 1 96 186v6h64v-6a32.1 32.1 0 0 1 12.5-25.4A71.8 71.8 0 0 0 200 104Zm-16.1-9.3a56.8 56.8 0 0 0-46.6-46.6a8 8 0 1 0-2.6 15.8a41 41 0 0 1 33.4 33.4a8 8 0 0 0 7.9 6.7a8.4 8.4 0 0 0 1.3-.1a8 8 0 0 0 6.6-9.2Z"></path></svg>
+              One thing to improve
+            </div>
+            <div style="font-size:13px; line-height:1.5; color:var(--color-accent-300);">{{ reader.note }}</div>
+          </div>
+          </sc-if>
+          <button class="btn" onClick="{{ scoreEntry }}" disabled="{{ scoring }}" style="width:100%; height:44px; font-size:14px; font-weight:600; border-radius:var(--radius-md); background:var(--color-surface); color:var(--color-accent-300); border:1.5px solid var(--color-accent); display:inline-flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-sm);" style-hover="background: var(--color-accent-900)">
+            <svg width="15" height="15" viewBox="0 0 256 256" fill="currentColor"><path d="M197.7 186.4A88 88 0 0 1 40 128a8 8 0 0 1 16 0a72 72 0 0 0 129.4 43.2L168 154a8 8 0 0 1 5.7-13.7l40 .1a8 8 0 0 1 8 8l-.1 40a8 8 0 0 1-13.7 5.6ZM216 128a8 8 0 0 1-8-8v-.1L191.7 136.3A8 8 0 0 1 216 128Zm-8-8a72 72 0 0 0-137.4-43.2L88 102a8 8 0 0 1-5.7 13.7l-40-.1a8 8 0 0 1-8-8l.1-40a8 8 0 0 1 13.7-5.6l10.2 10.3A88 88 0 0 1 216 120a8 8 0 0 1-8 8Z"></path></svg>
+            {{ rescoreLabel }}
+          </button>
+        </div>
+        </sc-if>
+        <sc-if value="{{ reader.noScores }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:13px; color:var(--color-neutral-400); line-height:1.5;">Six axes, scored per rep. Movement per axis, never one grade.</div>
+        <button class="btn" onClick="{{ scoreEntry }}" disabled="{{ scoring }}" style="width:100%; height:52px; font-size:16px; font-weight:600; border-radius:var(--radius-md); background:var(--color-accent); color:#f4f3ee; border:1px solid var(--color-accent-400); box-shadow:0 0 24px color-mix(in srgb, var(--color-accent) 45%, transparent), 0 4px 14px rgba(30,33,41,0.2); display:inline-flex; align-items:center; justify-content:center; gap:10px;" style-hover="background: var(--color-accent-400)">
+          <svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor"><path d="M234.5 114.4l-45.1-19.4l-19.4-45.1a15.9 15.9 0 0 0-29.4 0l-19.4 45.1l-45.1 19.4a15.9 15.9 0 0 0 0 29.4l45.1 19.4l19.4 45.1a15.9 15.9 0 0 0 29.4 0l19.4-45.1l45.1-19.4a15.9 15.9 0 0 0 0-29.4Zm-51.3 34.3a15.9 15.9 0 0 0-8.4 8.4L156 200.1l-18.8-43a15.9 15.9 0 0 0-8.4-8.4L85.9 130l43-18.8a15.9 15.9 0 0 0 8.4-8.4l18.7-43l18.8 43a15.9 15.9 0 0 0 8.4 8.4l43 18.7ZM32 64a8 8 0 0 1 8-8h16V40a8 8 0 0 1 16 0v16h16a8 8 0 0 1 0 16H72v16a8 8 0 0 1-16 0V72H40a8 8 0 0 1-8-8Z"></path></svg>
+          {{ scoreLabel }}
+        </button>
+        </sc-if>
+      </aside>
+    </section>
+    </sc-if>
+
+    <!-- ═══ STORY BANK ═══ -->
+    <sc-if value="{{ isBank }}" hint-placeholder-val="{{ false }}">
+    <section data-screen-label="Story Bank" style="display:grid; grid-template-columns:minmax(0,1fr) 260px; gap:var(--space-8); align-items:start;">
+      <aside style="display:flex; flex-direction:column; gap:var(--space-2); position:sticky; top:var(--space-4); order:2;">
+        <input class="input" placeholder="Search text, project, or date" value="{{ bankQuery }}" onChange="{{ onBankQuery }}">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
+          <div class="field" style="gap:2px;"><label style="font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-500);">From</label><input class="input" type="date" value="{{ bankFrom }}" onChange="{{ onBankFrom }}" style="font-size:12px; padding:6px 8px; color-scheme:dark;"></div>
+          <div class="field" style="gap:2px;"><label style="font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-500);">To</label><input class="input" type="date" value="{{ bankTo }}" onChange="{{ onBankTo }}" style="font-size:12px; padding:6px 8px; color-scheme:dark;"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--color-neutral-500); margin-bottom:var(--space-3); min-height:22px;">
+          <span>{{ bankHint }}</span>
+          <sc-if value="{{ bankHasFilters }}" hint-placeholder-val="{{ false }}"><button class="btn btn-ghost" onClick="{{ bankClearFilters }}" style="font-size:11px; padding:2px 8px;">Clear</button></sc-if>
+        </div>
+        <h6 style="color:var(--color-neutral-400);">Threads</h6>
+        <sc-for list="{{ threads }}" as="t" hint-placeholder-count="4">
+        <button onClick="{{ t.select }}" style="text-align:left; background:{{ t.bg }}; border:0; border-radius:var(--radius-md); padding:var(--space-2) var(--space-3); color:{{ t.color }}; font:inherit; cursor:pointer; display:flex; justify-content:space-between; gap:8px; box-shadow:{{ t.ring }};" style-hover="background: var(--color-neutral-900)">
+          <span style="font-size:14px; font-weight:{{ t.weight }};">{{ t.name }}</span><span style="font-size:12px; color:var(--color-neutral-500); white-space:nowrap;">{{ t.count }}</span>
+        </button>
+        </sc-for>
+        <div style="font-size:12px; color:var(--color-neutral-500); line-height:1.5; padding:var(--space-3) var(--space-3) 0;">A case study is usually four daily entries nobody connected. A thread connects them.</div>
+      </aside>
+
+      <div style="display:flex; flex-direction:column; gap:var(--space-6); min-width:0;">
+      <div>
+        <h6 style="color:var(--color-accent); margin-bottom:6px;">Story Bank</h6>
+        <h2 style="margin:0;">Raid the corpus</h2>
+      </div>
+
+
+        <div style="display:flex; flex-direction:column; gap:var(--space-3);">
+          <div style="display:flex; align-items:center; gap:var(--space-3); flex-wrap:wrap;">
+            <span style="font-size:12px; color:var(--color-neutral-400);">Show</span>
+            <div class="seg">
+              <button class="seg-opt" onClick="{{ toggleUnscored }}" style="color:{{ unscoredOpt.color }}; background:{{ unscoredOpt.bg }}; font-weight:{{ unscoredOpt.weight }}; box-shadow:{{ unscoredOpt.ring }}; cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:var(--radius-sm);">
+                <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M128 24a104 104 0 1 0 104 104A104.1 104.1 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Zm12-40a12 12 0 1 1-12-12a12 12 0 0 1 12 12Zm28-76c0 19.5-14 34.6-32 38.9V144a8 8 0 0 1-16 0v-12a8 8 0 0 1 8-8c13.2 0 24-9 24-20s-10.8-20-24-20s-24 9-24 20a8 8 0 0 1-16 0c0-19.9 17.9-36 40-36s40 16.1 40 36Z"></path></svg>
+                Unscored only
+              </button>
+            </div>
+            <span style="font-size:12px; color:var(--color-neutral-400); margin-left:var(--space-2);">Sort by</span>
+            <div class="seg">
+              <sc-for list="{{ sortOpts }}" as="o" hint-placeholder-count="2">
+              <button class="seg-opt" onClick="{{ o.select }}" style="color:{{ o.color }}; background:{{ o.bg }}; font-weight:{{ o.weight }}; box-shadow:{{ o.ring }}; cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:var(--radius-sm);">
+                <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="{{ o.icon }}"></path></svg>
+                {{ o.name }}
+              </button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:var(--space-3); flex-wrap:wrap;">
+            <span style="font-size:12px; color:var(--color-neutral-400); white-space:nowrap;" data-comment-anchor="9ca42fea0d-span">Strongest on</span>
+            <div class="seg" style="flex-wrap:wrap;">
+              <sc-for list="{{ axisOpts }}" as="o" hint-placeholder-count="6">
+              <button class="seg-opt" onClick="{{ o.select }}" style="color:{{ o.color }}; background:{{ o.bg }}; font-weight:{{ o.weight }}; box-shadow:{{ o.ring }}; cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:var(--radius-sm);">
+                <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="{{ o.icon }}"></path></svg>
+                {{ o.name }}
+              </button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ bankThreadLabel }}" hint-placeholder-val="{{ false }}">
+            <button class="btn btn-primary" onClick="{{ bankThreadToLadder }}" style="margin-left:auto;">Take “{{ bankThreadLabel }}” to the Ladder</button>
+            </sc-if>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:var(--space-3);">
+            <sc-for list="{{ bankPage }}" as="e" hint-placeholder-count="6">
+            <div class="card elev-sm" onClick="{{ e.open }}" style="cursor:pointer; gap:8px; padding:var(--space-4);" style-hover="background: var(--color-neutral-900)">
+              <div style="display:flex; justify-content:space-between; gap:8px; font-size:11px; color:var(--color-neutral-400); white-space:nowrap;"><span>{{ e.dateLabel }} · {{ e.project }}</span><span style="display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; font-weight:600; letter-spacing:0.04em; background:{{ e.axisBg }}; color:{{ e.axisColor }}; box-shadow:{{ e.axisRing }};">{{ e.axisLabel }}</span></div>
+              <div style="font-family:var(--font-heading); font-weight:500; font-size:{{ e.titleSize }}px; line-height:1.25; color:{{ e.titleColor }};">{{ e.title }}</div>
+              <div style="font-size:{{ e.bodySize }}px; line-height:1.5; color:{{ e.bodyColor }}; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">{{ e.snippet }}</div>
+              <div style="display:flex; gap:4px; margin-top:2px;"><sc-for list="{{ e.dots }}" as="d" hint-placeholder-count="6"><span title="{{ d.name }}" style="width:22px; height:3px; border-radius:2px; background:{{ d.bg }};"></span></sc-for></div>
+            </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ bankEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:14px; color:var(--color-neutral-500); padding:var(--space-6) 0;">Nothing matches. Loosen the search or pick another thread.</div>
+          </sc-if>
+          <sc-if value="{{ bankPaged }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); padding-top:var(--space-2);">
+            <span style="font-size:12px; color:var(--color-neutral-500);">{{ bankRangeLabel }}</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button class="btn btn-ghost" onClick="{{ bankPrev }}" disabled="{{ bankPrevDisabled }}" style="padding:6px 10px;">← Prev</button>
+              <sc-for list="{{ bankPages }}" as="pg" hint-placeholder-count="2">
+              <button onClick="{{ pg.go }}" style="width:32px; height:32px; border-radius:var(--radius-sm); border:0; cursor:pointer; font:inherit; font-size:13px; background:{{ pg.bg }}; color:{{ pg.color }};" style-hover="background: var(--color-neutral-800)">{{ pg.n }}</button>
+              </sc-for>
+              <button class="btn btn-ghost" onClick="{{ bankNext }}" disabled="{{ bankNextDisabled }}" style="padding:6px 10px;">Next →</button>
+            </div>
+          </div>
+          </sc-if>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- ═══ COMPRESSION LADDER ═══ -->
+    <sc-if value="{{ isLadder }}" hint-placeholder-val="{{ false }}">
+    <section data-screen-label="Compression Ladder" style="display:flex; flex-direction:column; gap:var(--space-6);">
+      <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:var(--space-4); flex-wrap:wrap;">
+        <div style="display:flex; flex-direction:column; gap:var(--space-3); align-items:flex-start;">
+          <button class="btn btn-secondary" onClick="{{ ladderBack }}" style="height:40px; padding:0 16px 0 12px; font-size:14px; font-weight:500; display:inline-flex; align-items:center; gap:8px; background:var(--color-neutral-900); border:1px solid var(--color-neutral-700); color:var(--color-text);" style-hover="background: var(--color-neutral-800); border-color: var(--color-accent)">
+            <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M224 128a8 8 0 0 1-8 8H59.3l58.4 58.3a8 8 0 0 1-11.4 11.4l-72-72a8 8 0 0 1 0-11.4l72-72a8 8 0 0 1 11.4 11.4L59.3 120H216a8 8 0 0 1 8 8Z"></path></svg>
+            {{ ladderBackLabel }}
+          </button>
+          <div>
+            <h6 style="color:var(--color-accent); margin-bottom:6px;">Compression Ladder</h6>
+            <h2 style="margin:0;">{{ ladderHeading }}</h2>
+          </div>
+        </div>
+        <sc-if value="{{ ladderHasThread }}" hint-placeholder-val="{{ false }}">
+        <button class="btn btn-ghost" onClick="{{ ladderReset }}">Pick a different thread</button>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ ladderPicking }}" hint-placeholder-val="{{ true }}">
+      <p style="max-width:56ch; font-size:15px; color:var(--color-neutral-300); margin:0;">Retell one project three times — 30 seconds, 2 minutes, 10 minutes. Your daily entries are the baseline; each rung asks what survives the cut.</p>
+      <div style="display:flex; align-items:center; gap:var(--space-3); flex-wrap:wrap;">
+        <div style="position:relative; flex:1; min-width:240px; max-width:420px;">
+          <svg width="15" height="15" viewBox="0 0 256 256" fill="currentColor" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--color-neutral-500); pointer-events:none;"><path d="M229.7 218.3l-43.3-43.3a92.2 92.2 0 1 0-11.3 11.3l43.3 43.3a8 8 0 0 0 11.3-11.3ZM40 112a72 72 0 1 1 72 72a72.1 72.1 0 0 1-72-72Z"></path></svg>
+          <input class="input" placeholder="Search threads or entries" value="{{ ladderQuery }}" onChange="{{ onLadderQuery }}" style="padding-left:36px;">
+        </div>
+        <span style="font-size:12px; color:var(--color-neutral-500);">{{ ladderThreadCount }}</span>
+      </div>
+      <sc-if value="{{ ladderNoMatch }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:14px; color:var(--color-neutral-500);">No thread matches “{{ ladderQuery }}”.</div>
+      </sc-if>
+      <div style="display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:var(--space-3);">
+        <sc-for list="{{ ladderThreads }}" as="t" hint-placeholder-count="4">
+        <div class="card elev-sm" onClick="{{ t.pick }}" style="cursor:pointer; padding:var(--space-4); gap:6px;" style-hover="background: var(--color-neutral-900)">
+          <div class="card-kicker">{{ t.count }}</div>
+          <div class="card-title">{{ t.name }}</div>
+          <div class="card-body">{{ t.summary }}</div>
+          <div class="card-meta">{{ t.baseline }}</div>
+        </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ runsLabel }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:12px; color:var(--color-neutral-500);">{{ runsLabel }}</div>
+      </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ ladderHasThread }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:var(--space-8); align-items:start;">
+        <div style="display:flex; flex-direction:column; gap:var(--space-4);">
+          <sc-for list="{{ rungs }}" as="r" hint-placeholder-count="3">
+          <div class="card" style="padding:var(--space-4); gap:var(--space-3); box-shadow:{{ r.ring }}; opacity:{{ r.opacity }}; transition:opacity .2s;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; gap:var(--space-4);">
+              <div style="display:flex; align-items:baseline; gap:12px;">
+                <span style="font-family:var(--font-heading); font-weight:500; font-size:26px; color:{{ r.numColor }};">{{ r.name }}</span>
+                <span class="card-kicker">{{ r.kicker }}</span>
+              </div>
+              <div style="font-size:11px; color:var(--color-neutral-400); display:flex; gap:10px;"><span>{{ r.timer }}</span><span>{{ r.wordLabel }}</span></div>
+            </div>
+            <div style="height:3px; border-radius:2px; background:var(--color-neutral-800); overflow:hidden;"><div style="height:100%; width:{{ r.pct }}%; background:{{ r.barColor }}; transition:width .2s linear;"></div></div>
+            <p class="card-body" style="color:var(--color-neutral-400); margin:0;">{{ r.hint }}</p>
+            <sc-if value="{{ r.unlocked }}" hint-placeholder-val="{{ true }}">
+            <textarea class="input" placeholder="{{ r.placeholder }}" value="{{ r.value }}" onChange="{{ r.onChange }}" onFocus="{{ r.onFocus }}" style="min-height:{{ r.minH }}px;"></textarea>
+            <sc-if value="{{ r.showInterim }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:13px; font-style:italic; color:var(--color-neutral-500);">{{ r.interim }}</div>
+            </sc-if>
+            <div style="display:flex; align-items:center; gap:var(--space-4);">
+              <button class="btn {{ r.btnClass }}" onClick="{{ r.onRecord }}" disabled="{{ r.disabled }}" style="min-width:104px;">
+                <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor"><path d="M128 176a48 48 0 0 0 48-48V64a48 48 0 0 0-96 0v64a48 48 0 0 0 48 48Zm-32-112a32 32 0 0 1 64 0v64a32 32 0 0 1-64 0Zm40 143.6V232a8 8 0 0 1-16 0v-24.4A80.1 80.1 0 0 1 48 128a8 8 0 0 1 16 0a64 64 0 0 0 128 0a8 8 0 0 1 16 0a80.1 80.1 0 0 1-72 79.6Z"></path></svg>
+                {{ r.recLabel }}
+              </button>
+              <sc-if value="{{ r.isRecording }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="width:8px; height:8px; border-radius:50%; background:var(--color-accent-400); box-shadow:0 0 10px var(--color-accent);"></span>
+                <div style="width:72px; height:4px; border-radius:2px; background:var(--color-neutral-800); overflow:hidden;"><div style="height:100%; width:{{ level }}%; background:var(--color-accent); transition:width .08s linear;"></div></div>
+              </div>
+              </sc-if>
+              <span style="margin-left:auto; font-size:11px; color:var(--color-neutral-400);">{{ r.overLabel }}</span>
+            </div>
+            </sc-if>
+            <sc-if value="{{ r.locked }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12px; color:var(--color-neutral-400);">Unlocks when the rung above has content.</div>
+            </sc-if>
+          </div>
+          </sc-for>
+          <div style="display:flex; gap:var(--space-2); align-items:center;">
+            <button class="btn btn-primary" disabled="{{ ladderSaveDisabled }}" onClick="{{ saveRun }}">Save run</button>
+            <span style="font-size:13px; color:var(--color-neutral-400);">{{ ladderGate }}</span>
+          </div>
+        </div>
+
+        <aside style="display:flex; flex-direction:column; gap:var(--space-3); position:sticky; top:var(--space-4);">
+          <div class="card" style="padding:var(--space-4); gap:var(--space-2);">
+            <div class="card-kicker">Baseline</div>
+            <div style="font-size:26px; font-family:var(--font-heading); font-weight:500;">{{ ladderBaseline }}</div>
+            <div style="font-size:12px; color:var(--color-neutral-500); line-height:1.5;">{{ ladderBaselineNote }}</div>
+          </div>
+          <div class="card" style="padding:var(--space-4); gap:var(--space-2);">
+            <div class="card-kicker">Compare</div>
+            <sc-for list="{{ compareRows }}" as="c" hint-placeholder-count="3">
+            <div style="display:grid; grid-template-columns:44px 1fr auto; gap:8px; font-size:13px; align-items:center;">
+              <span style="color:var(--color-neutral-400);">{{ c.name }}</span>
+              <div style="height:3px; background:var(--color-neutral-800); border-radius:2px; overflow:hidden;"><div style="height:100%; width:{{ c.pct }}%; background:var(--color-accent-600);"></div></div>
+              <span style="color:var(--color-neutral-500); white-space:nowrap;">{{ c.meta }}</span>
+            </div>
+            </sc-for>
+            <div style="font-size:12px; color:var(--color-neutral-500); line-height:1.5; margin-top:4px;">{{ compareNote }}</div>
+          </div>
+          <h6 style="color:var(--color-neutral-400); margin:var(--space-2) 0 0;">Source entries</h6>
+          <sc-for list="{{ ladderSources }}" as="e" hint-placeholder-count="2">
+          <div class="card" onClick="{{ e.open }}" style="cursor:pointer; gap:4px; padding:var(--space-3);" style-hover="background: var(--color-neutral-900)">
+            <div style="font-size:11px; color:var(--color-neutral-400);">{{ e.dateLabel }} · {{ e.spoken }}</div>
+            <div style="font-size:14px; font-family:var(--font-heading); font-weight:500;">{{ e.title }}</div>
+          </div>
+          </sc-for>
+        </aside>
+      </div>
+      </sc-if>
+    </section>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+  <div role="status" aria-live="polite" style="position:fixed; left:50%; bottom:28px; transform:translateX(-50%); padding:var(--space-2) var(--space-4); border-radius:var(--radius-md); background:var(--color-surface); box-shadow:var(--shadow-md); font-size:13px;">{{ toast }}</div>
+  </sc-if>
+</div>
+  </template>
+<script>
+// A small runtime for the Claude Design template in index.html.
+//
+// It understands the syntax the design was built with: {{ holes }}, <sc-if value>,
+// <sc-for list as>, on* handlers and style-hover. Each render turns the template
+// into HTML against the component's renderVals(), then patches the live DOM in
+// place, so focus, the caret and scroll position survive every re-render.
+// No framework, no build step.
+(function () {
+  const EVENTS = { onclick: 'click', onchange: 'input', onfocus: 'focusin', onkeydown: 'keydown' };
+  const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
+  const HOLE = /\{\{\s*([^}]*?)\s*\}\}/g;
+  const WHOLE = /^\s*\{\{\s*([^}]*?)\s*\}\}\s*$/;
+
+  const escapeHtml = (value) =>
+    String(value).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+  // ------------------------------------------------------------------ values
+
+  // A hole is a dotted lookup (`b.label`, `reader.title`) or a literal — never an expression.
+  function lookup(expr, scope) {
+    if (expr === 'true') return true;
+    if (expr === 'false') return false;
+    if (expr === 'null') return null;
+    if (/^-?\d+(\.\d+)?$/.test(expr)) return Number(expr);
+    const [head, ...rest] = expr.split('.');
+    let s = scope;
+    while (s && !Object.prototype.hasOwnProperty.call(s.vars, head)) s = s.parent;
+    if (!s) return undefined;
+    let value = s.vars[head];
+    for (const key of rest) {
+      if (value == null) return undefined;
+      value = value[key];
+    }
+    return value;
+  }
+
+  const interpolate = (text, scope) =>
+    text.replace(HOLE, (_, expr) => {
+      const value = lookup(expr, scope);
+      return value == null ? '' : String(value);
+    });
+
+  // A whole-value hole keeps its raw value (a function, a boolean); anything else is a string.
+  function attr(node, name, scope) {
+    const raw = node.getAttribute(name);
+    if (raw == null) return undefined;
+    const whole = WHOLE.exec(raw);
+    return whole ? lookup(whole[1], scope) : interpolate(raw, scope);
+  }
+
+  // ------------------------------------------------------------------- hover
+
+  const hoverSheet = document.head.appendChild(document.createElement('style'));
+  const hoverClasses = new Map();
+
+  // style-hover="background: …" becomes a generated class; !important beats the inline style.
+  function hoverClass(declarations) {
+    if (!hoverClasses.has(declarations)) {
+      const name = `dc-hover-${hoverClasses.size}`;
+      const rules = declarations.split(';').map((d) => d.trim()).filter(Boolean).map((d) => `${d} !important`).join('; ');
+      hoverSheet.textContent += `.${name}:hover:not(:disabled) { ${rules}; }\n`;
+      hoverClasses.set(declarations, name);
+    }
+    return hoverClasses.get(declarations);
+  }
+
+  // ------------------------------------------------------------------ render
+
+  // Every rendered element carries the id of the template node it came from, so
+  // the patcher can tell "the same element, updated" from "a different element".
+  const templateIds = new WeakMap();
+  let nextTemplateId = 0;
+  const templateId = (node) => {
+    if (!templateIds.has(node)) templateIds.set(node, nextTemplateId++);
+    return templateIds.get(node);
+  };
+
+  function renderChildren(parent, scope, ctx) {
+    let html = '';
+    for (const child of parent.childNodes) html += renderNode(child, scope, ctx);
+    return html;
+  }
+
+  function renderNode(node, scope, ctx) {
+    if (node.nodeType === Node.TEXT_NODE) return escapeHtml(interpolate(node.nodeValue, scope));
+    if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+    const tag = node.localName;
+    if (tag === 'sc-if') return attr(node, 'value', scope) ? renderChildren(node, scope, ctx) : '';
+    if (tag === 'sc-for') {
+      const list = attr(node, 'list', scope);
+      const as = node.getAttribute('as') || 'item';
+      let html = '';
+      if (list && typeof list.forEach === 'function') {
+        list.forEach((item, index) => {
+          html += renderChildren(node, { vars: { [as]: item, $index: index }, parent: scope }, ctx);
+        });
+      }
+      return html;
+    }
+
+    let attrs = ` data-dc="${templateId(node)}"`;
+    const classes = [];
+    for (const { name, value } of Array.from(node.attributes)) {
+      if (name.startsWith('hint-') || name === 'data-comment-anchor') continue;
+      if (EVENTS[name]) {
+        const handler = attr(node, name, scope);
+        if (typeof handler === 'function') attrs += ` data-on-${EVENTS[name]}="${ctx.handlers.push(handler) - 1}"`;
+      } else if (name === 'style-hover') {
+        classes.push(hoverClass(value));
+      } else if (name === 'class') {
+        classes.unshift(interpolate(value, scope));
+      } else if (name === 'autofocus') {
+        if (attr(node, name, scope)) attrs += ' data-autofocus=""';
+      } else if (name === 'disabled') {
+        if (attr(node, name, scope)) attrs += ' disabled=""';
+      } else if (!(name === 'value' && tag === 'textarea')) {
+        attrs += ` ${name}="${escapeHtml(interpolate(value, scope))}"`;
+      }
+    }
+    const className = classes.join(' ').trim();
+    if (className) attrs += ` class="${escapeHtml(className)}"`;
+
+    if (tag === 'textarea') {
+      const value = attr(node, 'value', scope);
+      // The leading newline is eaten by the parser, so a value starting with one survives.
+      return `<textarea${attrs}>\n${escapeHtml(value == null ? '' : value)}</textarea>`;
+    }
+    if (VOID.has(tag)) return `<${tag}${attrs}>`;
+    return `<${tag}${attrs}>${renderChildren(node, scope, ctx)}</${tag}>`;
+  }
+
+  // ------------------------------------------------------------------- patch
+
+  function sameElement(a, b) {
+    return a.nodeType === Node.ELEMENT_NODE && a.tagName === b.tagName && a.getAttribute('data-dc') === b.getAttribute('data-dc');
+  }
+
+  function patchChildren(from, to) {
+    let current = from.firstChild;
+    for (const next of Array.from(to.childNodes)) {
+      if (next.nodeType !== Node.ELEMENT_NODE) {
+        if (current && current.nodeType === next.nodeType) {
+          if (current.nodeValue !== next.nodeValue) current.nodeValue = next.nodeValue;
+          current = current.nextSibling;
+        } else {
+          from.insertBefore(next, current);
+        }
+        continue;
+      }
+      let match = current;
+      while (match && !sameElement(match, next)) match = match.nextSibling;
+      if (match) {
+        while (current !== match) {
+          const stale = current;
+          current = current.nextSibling;
+          from.removeChild(stale);
+        }
+        patchElement(match, next);
+        current = match.nextSibling;
+      } else {
+        from.insertBefore(next, current);
+      }
+    }
+    while (current) {
+      const stale = current;
+      current = current.nextSibling;
+      from.removeChild(stale);
+    }
+  }
+
+  function patchElement(el, next) {
+    for (const { name } of Array.from(el.attributes)) if (!next.hasAttribute(name)) el.removeAttribute(name);
+    for (const { name, value } of Array.from(next.attributes)) if (el.getAttribute(name) !== value) el.setAttribute(name, value);
+
+    // Form values are properties, not attributes. Writing only when they differ
+    // leaves the caret alone while someone is typing.
+    if (el.tagName === 'TEXTAREA') {
+      if (el.value !== next.textContent) el.value = next.textContent;
+      return;
+    }
+    if (el.tagName === 'INPUT' && next.hasAttribute('value') && el.value !== next.getAttribute('value')) {
+      el.value = next.getAttribute('value');
+    }
+    patchChildren(el, next);
+  }
+
+  // ------------------------------------------------------------------- mount
+
+  // The base class the design's logic extends: React-style state without React.
+  class DCLogic {
+    constructor() {
+      this.props = {};
+      this.state = {};
+    }
+    setState(patch) {
+      const update = typeof patch === 'function' ? patch(this.state, this.props) : patch;
+      if (update) this.state = { ...this.state, ...update };
+      if (this.__schedule) this.__schedule();
+    }
+    forceUpdate() {
+      if (this.__schedule) this.__schedule();
+    }
+  }
+
+  function mount(root, template, Component, props = {}) {
+    const component = new Component();
+    component.props = Object.freeze({ ...props });
+    let handlers = [];
+    let queued = false;
+
+    function render() {
+      queued = false;
+      const ctx = { handlers: [] };
+      const html = renderChildren(template.content, { vars: component.renderVals(), parent: null }, ctx);
+      const next = document.createElement('template');
+      next.innerHTML = html;
+      handlers = ctx.handlers;
+      patchChildren(root, next.content);
+      for (const el of root.querySelectorAll('[data-autofocus]')) {
+        if (!el.__dcFocused) {
+          el.__dcFocused = true;
+          el.focus();
+        }
+      }
+    }
+
+    // Batch updates into the next frame. Hidden tabs get no animation frames, so
+    // fall back to a timer there and the page stays current in the background.
+    component.__schedule = () => {
+      if (!queued) {
+        queued = true;
+        if (document.hidden) setTimeout(render, 0);
+        else requestAnimationFrame(render);
+      }
+    };
+
+    // One delegated listener per event type, bubbling from the target up to the root.
+    for (const type of new Set(Object.values(EVENTS))) {
+      root.addEventListener(type, (event) => {
+        for (let el = event.target; el && el !== root; el = el.parentNode) {
+          const id = el.getAttribute && el.getAttribute(`data-on-${type}`);
+          if (id != null && handlers[id]) {
+            handlers[id](event);
+            if (event.cancelBubble) break;
+          }
+        }
+      });
+    }
+
+    render();
+    if (component.componentDidMount) component.componentDidMount();
+    return component;
+  }
+
+  window.DCLogic = DCLogic;
+  window.DC = { mount };
+})();
+
+</script>
+<script>
+// The design's tweaks, at its defaults. Flip one and reload the page.
+// Generated by tools/sync-design.mjs; re-syncing resets them.
+window.TWEAKS = {
+  showStreak: true, // Behavior
+  keepAudio: true, // Behavior
+  contentFirstShelf: false, // Queued changes (PRD §7)
+  quietRecording: false, // Queued changes (PRD §7)
+};
+
+</script>
+<script>
+// The design's logic, unchanged. Generated from "Storytelling Practice.dc.html" by tools/sync-design.mjs;
+// re-syncing overwrites this file.
+
+const KEY = 'sad.v1.';
+const AXES = [
+  { key: 'stakes', name: 'Stakes', q: 'Did anything hang on this?' },
+  { key: 'specificity', name: 'Specificity', q: 'Real names, numbers, moments?' },
+  { key: 'structure', name: 'Structure', q: 'A turn, or just a chronology?' },
+  { key: 'self', name: 'Self', q: 'Is your own role legible?' },
+  { key: 'sowhat', name: 'So-what', q: 'Does the ending land somewhere?' },
+  { key: 'compression', name: 'Compression', q: 'Would it survive being cut in half?' }
+];
+const BEATS = [
+  { key: 'sense', n: '01', label: 'Sense', prompt: 'What did you notice today?', hint: 'A friction, a face, an offhand comment in standup. Something you would otherwise forget by Friday.' },
+  { key: 'did', n: '02', label: 'Did', prompt: 'What did you actually do?', hint: 'Not the plan — the decision. What you argued for, what you cut, what you traded away to get it.' },
+  { key: 'story', n: '03', label: 'Story', prompt: 'So what’s the story?', hint: 'Once upon a time… until one day… because of that… Give it a villain and a turn.' }
+];
+const AXIS_ICONS = {
+  stakes: 'M240 112h-16.6a80.1 80.1 0 0 0-70.5-70.6v-.1a8 8 0 0 0-16 0v.1a80.1 80.1 0 0 0-70.5 70.6H16a8 8 0 0 0 0 16h50.4a80.1 80.1 0 0 0 70.5 70.6a8 8 0 0 0 16 0a80.1 80.1 0 0 0 70.5-70.6H240a8 8 0 0 0 0-16Zm-96-54.4V72a8 8 0 0 0-16 0V57.6A64.2 64.2 0 0 0 82.5 112H96a8 8 0 0 0 0 16H82.5a64.2 64.2 0 0 0 45.5 54.4V168a8 8 0 0 0 16 0v14.4a64.2 64.2 0 0 0 45.5-54.4H176a8 8 0 0 0 0-16h13.5A64.2 64.2 0 0 0 144 57.6Z',
+  specificity: 'M232 208a8 8 0 0 1-8 8H32a8 8 0 0 1-8-8V48a8 8 0 0 1 16 0v94.4l60.3-52.7a8 8 0 0 1 10.3-.2l63 50.3l54.8-59.2a8 8 0 0 1 11.6 11l-60 64.9a8 8 0 0 1-10.9 1L106.3 105.7L40 163.6V200h184a8 8 0 0 1 8 8Z',
+  structure: 'M104 40H56a16 16 0 0 0-16 16v48a16 16 0 0 0 16 16h48a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm0 64H56V56h48Zm96-64h-48a16 16 0 0 0-16 16v48a16 16 0 0 0 16 16h48a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm0 64h-48V56h48Zm-96 32H56a16 16 0 0 0-16 16v48a16 16 0 0 0 16 16h48a16 16 0 0 0 16-16v-48a16 16 0 0 0-16-16Zm0 64H56v-48h48Zm96-64h-48a16 16 0 0 0-16 16v48a16 16 0 0 0 16 16h48a16 16 0 0 0 16-16v-48a16 16 0 0 0-16-16Zm0 64h-48v-48h48Z',
+  self: 'M230.9 212a8 8 0 0 1-6.9 4H32a8 8 0 0 1-6.9-12c15.4-26.7 39.4-46.1 67.5-55.5a72 72 0 1 1 70.8 0c28.1 9.4 52.1 28.8 67.5 55.5a8 8 0 0 1 0 8ZM72 96a56 56 0 1 0 56-56a56.1 56.1 0 0 0-56 56Z',
+  sowhat: 'M128 24a104 104 0 1 0 104 104A104.1 104.1 0 0 0 128 24Zm45.7 109.7l-40 40a8 8 0 0 1-11.4-11.4L148.7 136H88a8 8 0 0 1 0-16h60.7l-26.4-26.3a8 8 0 0 1 11.4-11.4l40 40a8 8 0 0 1 0 11.4Z',
+  compression: 'M213.7 82.3a8 8 0 0 1-11.4 11.4L184 75.3V120a8 8 0 0 1-16 0V75.3l-18.3 18.4a8 8 0 0 1-11.4-11.4l32-32a8 8 0 0 1 11.4 0ZM72 136a8 8 0 0 0-8 8v44.7l-18.3-18.4a8 8 0 0 0-11.4 11.4l32 32a8 8 0 0 0 11.4 0l32-32a8 8 0 0 0-11.4-11.4L80 188.7V144a8 8 0 0 0-8-8Zm160-8H24a8 8 0 0 0 0 16h208a8 8 0 0 0 0-16Z'
+};
+const STEP_HUES = [
+  { main: 'var(--color-accent)', dim: 'color-mix(in srgb, var(--color-accent) 18%, transparent)' },
+  { main: 'oklch(0.47 0.09 165)', dim: 'color-mix(in srgb, oklch(0.47 0.09 165) 18%, transparent)' },
+  { main: 'oklch(0.52 0.12 65)', dim: 'color-mix(in srgb, oklch(0.52 0.12 65) 18%, transparent)' }
+];
+const RUNGS = [
+  { name: '30 s', kicker: 'The elevator', sec: 30, hint: 'One villain, one turn, one result. Nothing about process.', ph: 'Tell it in two breaths.' },
+  { name: '2 min', kicker: 'The interview answer', sec: 120, hint: 'Add the decision you made and what it cost you.', ph: 'Same story — now with the decision.' },
+  { name: '10 min', kicker: 'The case study', sec: 600, hint: 'Process is allowed in now — only where it earns its place.', ph: 'The full telling. Keep the villain in view.' }
+];
+const load = (k, f) => { try { const v = localStorage.getItem(KEY + k); return v ? JSON.parse(v) : f; } catch (e) { return f; } };
+const save = (k, v) => { try { localStorage.setItem(KEY + k, JSON.stringify(v)); } catch (e) {} };
+const words = s => (s || '').trim() ? s.trim().split(/\s+/).length : 0;
+const fmt = s => { s = Math.round(s || 0); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const dayKey = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const niceDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }); };
+const daysAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return d; };
+const fallbackTitle = story => {
+  let t = (story || '').split(/(?<=[.!?])\s|—|;/)[0].trim().replace(/^(so|and|but|well|basically|once upon a time),?\s+/i, '');
+  if (t.length > 60) { const c = t.slice(0, 60); t = c.slice(0, c.lastIndexOf(' ')) + '…'; }
+  return t ? t[0].toUpperCase() + t.slice(1) : 'Untitled entry';
+};
+const snapOf = e => ({ at: new Date().toISOString(), title: e.title, sense: e.sense, did: e.did, story: e.story, scores: e.scores || null });
+const withVersion = (e, patch) => { const textChanged = ['sense', 'did', 'story'].some(k => k in patch && patch[k] !== e[k]); return { ...e, ...patch, scoresStale: textChanged ? !!e.scores : e.scoresStale, versions: [snapOf(e), ...(e.versions || [])].slice(0, 20) }; };
+const wordDiff = (a, b) => {
+  const A = (a || '').split(/(\s+)/).filter(Boolean), B = (b || '').split(/(\s+)/).filter(Boolean);
+  const n = A.length, m = B.length, L = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const out = []; let i = 0, j = 0;
+  const push = (kind, text) => { const last = out[out.length - 1]; if (last && last.kind === kind) last.text += text; else out.push({ kind, text }); };
+  while (i < n && j < m) { if (A[i] === B[j]) { push('same', A[i]); i++; j++; } else if (L[i + 1][j] >= L[i][j + 1]) { push('del', A[i]); i++; } else { push('add', B[j]); j++; } }
+  while (i < n) push('del', A[i++]); while (j < m) push('add', B[j++]);
+  return out.map(t => ({ ...t, bg: t.kind === 'del' ? 'oklch(0.92 0.05 25)' : t.kind === 'add' ? 'var(--color-accent-900)' : 'transparent', color: t.kind === 'del' ? 'oklch(0.35 0.1 25)' : t.kind === 'add' ? 'var(--color-accent-200)' : 'inherit', deco: t.kind === 'del' ? 'line-through' : 'none' }));
+};
+const audioDB = (() => {
+  let p; const open = () => p || (p = new Promise((res, rej) => { const r = indexedDB.open('sad-audio', 1); r.onupgradeneeded = () => r.result.createObjectStore('clips'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }));
+  const tx = (mode, fn) => open().then(db => new Promise((res, rej) => { const t = db.transaction('clips', mode); const rq = fn(t.objectStore('clips')); t.oncomplete = () => res(rq && rq.result); t.onerror = () => rej(t.error); }));
+  return { put: (k, blob) => tx('readwrite', st => st.put(blob, k)), get: k => tx('readonly', st => st.get(k)), del: k => tx('readwrite', st => st.delete(k)) };
+})();
+const heuristicScores = e => {
+  const all = [e.sense, e.did, e.story].join(' '); const w = words(all);
+  const c = v => Math.max(1, Math.min(5, Math.round(v)));
+  const n = (s, re) => (s.match(re) || []).length;
+  return {
+    stakes: c(1 + n(all, /\b(risk|deadline|lost|losing|churn|angry|blocked|pushback|launch|revenue|cut|escalat|refus|failed|broke|fight|vs)\w*/gi)),
+    specificity: c(1 + n(all, /\d+|%|\b[A-Z][a-z]+\b/g) / 3),
+    structure: c(1 + n(e.story, /\b(until|but|however|then|because|instead|turned out|except)\b/gi) * 1.2),
+    self: c(1 + n(all, /\bI\b|\bmy\b|\bI'd\b|\bI've\b/g) / 2),
+    sowhat: c(1 + n(e.story, /\b(result|shipped|so now|which meant|went from|now|ended|landed|saved)\b/gi) * 1.5),
+    compression: c(w < 60 ? 2 : w < 220 ? 5 : w < 350 ? 4 : w < 500 ? 3 : 2),
+    note: 'Heuristic score — Claude was unreachable. Re-score when online.'
+  };
+};
+const seedEntries = () => {
+  const mk = (ago, title, project, sense, did, story, dur, scores) => ({
+    id: dayKey(daysAgo(ago)) + '-' + Math.random().toString(36).slice(2, 8), date: dayKey(daysAgo(ago)),
+    createdAt: daysAgo(ago).toISOString(), title, project, sense, did, story, durations: dur, scores: scores || null, seeded: true
+  });
+  return [
+    mk(1, 'The villain was our own happy path', 'Checkout redesign',
+      'Support pinged a thread where a customer had typed her card number into the promo-code field. Third one this month. Everyone laughed and moved on.',
+      'I pulled the last 30 session recordings for the payment step instead of the funnel dashboard. Watched them at 2x in the corner of a meeting. Promo field sits exactly where the card field sits on every other site she uses.',
+      'We spent a quarter optimising a checkout that worked perfectly — for people who already knew it. Until the third card-in-the-promo-field ticket, I hadn’t watched a single real session. Because of that, I moved the promo field below the fold and cut the “apply” button. Payment errors dropped 14% in two weeks, and nobody had asked for it.',
+      { sense: 38, did: 71, story: 84 }, { stakes: 4, specificity: 5, structure: 4, self: 4, sowhat: 5, compression: 4, note: 'Strong turn. The 14% is the ending — say it first in the 30-second version.' }),
+    mk(3, 'Arguing against my own mockup', 'Checkout redesign',
+      'Priya, the eng lead, said “we can ship the old flow with the new colours in two days” and half the room nodded.',
+      'I killed my own three-step redesign in the meeting and proposed shipping the address autocomplete alone. Kept the redesign in a doc nobody asked for.',
+      'The story I wanted to tell was about a beautiful new checkout. The story that was true was that one autocomplete field was worth more than the whole thing, and I was the only one in the room who could see that from the recordings. I traded the portfolio piece for the metric.',
+      { sense: 29, did: 55, story: 62 }, { stakes: 4, specificity: 3, structure: 4, self: 5, sowhat: 3, compression: 5, note: 'Your role is vivid. Land the ending on a number, not a mood.' }),
+    mk(5, 'Two-day estimate, twenty-day reality', 'Checkout redesign',
+      'The address autocomplete “two-day” ship is on day nine. Nobody has said so out loud.',
+      'Wrote a one-line status in the channel with the actual date, then sat with the backend engineer to find that the API returns Irish postcodes as null.',
+      'I noticed the quiet. Until I named the date, the estimate was a secret everyone kept. Because of that we found the postcode bug in an hour instead of at launch.',
+      { sense: 24, did: 40, story: 46 }, null),
+    mk(7, 'The persona nobody used', 'Onboarding',
+      'In the kickoff, the PM presented four personas from 2023. Nobody referred to them again in the next 50 minutes.',
+      'Replaced the four personas in the brief with two verbatim quotes from last week’s calls. Cut the slide with the double-diamond diagram.',
+      'Every project starts with a ritual we all silently agree to ignore. I decided to stop performing it. The brief got shorter and the eng team actually read it — two of them quoted the customer back to me in review.',
+      { sense: 33, did: 48, story: 70 }, { stakes: 2, specificity: 4, structure: 3, self: 4, sowhat: 3, compression: 4, note: 'Low stakes — what would have gone wrong if you had kept the personas?' }),
+    mk(9, 'Step 3 of 7 is where they leave', 'Onboarding',
+      'Amplitude shows 41% drop at the “connect your calendar” step. Marco assumed it was a permissions problem.',
+      'Ran five 15-minute calls. Four people said the same thing: they didn’t know why we needed the calendar yet. It wasn’t permission, it was purpose.',
+      'We were about to spend a sprint on an OAuth flow that wasn’t broken. Until the fourth call, when a woman asked “what’s this for?” and I realised we’d never said. One sentence of copy above the button. Drop went from 41% to 23%.',
+      { sense: 41, did: 66, story: 79 }, { stakes: 5, specificity: 5, structure: 5, self: 3, sowhat: 5, compression: 5, note: 'Interview-ready. Make “I” carry the diagnosis — it currently reads as the team’s.' }),
+    mk(12, 'Forty-one shades of grey', 'Design system migration',
+      'Counted the greys in the product: 41 distinct hex values across 12 screens. Three of them differ by one digit.',
+      'Instead of proposing a new palette, I proposed deleting 35 colours and shipped a PR that replaced them with the 6 that remained. No review meeting.',
+      'Nobody wanted a design-system project. Everyone wanted the greys to stop multiplying. I framed the migration as deletion, and the engineers merged it in a day because it removed code rather than adding it.',
+      { sense: 27, did: 58, story: 61 }, { stakes: 3, specificity: 5, structure: 4, self: 5, sowhat: 3, compression: 5, note: 'The reframe is the story. Say what it cost — did anything break?' }),
+    mk(15, 'The button that lied', 'Design system migration',
+      'Our “secondary” button is visually identical to “disabled” on the dark theme. A tester clicked a disabled one four times.',
+      'Argued for one hour that we should lower disabled to 45% opacity rather than adding a fourth button style. Lost on the first call, won on the second with a recording.',
+      'I lost the argument on aesthetics and won it on evidence. The recording of four clicks on a dead button did what my mockups couldn’t.',
+      { sense: 22, did: 44, story: 39 }, null),
+    mk(19, 'Pricing page, or a page about us', 'Pricing page',
+      'Sales sent me a Loom of a prospect scrolling past the pricing table to find the FAQ answer “can I cancel any time”.',
+      'Moved the cancellation line above the table, in plain text, before the tiers. Marketing pushed back that it “leads with leaving”.',
+      'The page was written to say what we wanted; the customer came to check one fear. I bet the page on answering the fear first. Trial starts went up 9% — and the cancellation rate didn’t move.',
+      { sense: 30, did: 47, story: 68 }, { stakes: 4, specificity: 4, structure: 4, self: 4, sowhat: 5, compression: 4, note: 'Good. Give marketing’s objection one more sentence — the villain deserves a face.' })
+  ];
+};
+
+class Component extends DCLogic {
+  state = {
+    view: 'today', entries: [], runs: [], draft: { sense: '', did: '', story: '', durations: {} }, active: 'sense',
+    recording: false, recTarget: null, interim: '', level: 0, elapsed: 0, speechSupported: true, micError: null,
+    titling: false, title: '', project: '', titleBusy: false, toast: '', openId: null, scoring: false,
+    bankAxis: 'stakes', bankQuery: '', bankThread: null,
+    ladder: { thread: null, rung: 0, texts: {}, durations: {} }
+  };
+  componentDidMount() {
+    let entries = load('entries', null);
+    if (!entries) { entries = seedEntries(); save('entries', entries); }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    this.setState({ entries, runs: load('runs', []), draft: load('draft', this.state.draft), speechSupported: !!SR,
+      micError: SR ? null : 'This browser has no speech recognition (Firefox, for one). Type instead — everything else works.' });
+    this.onKey = e => {
+      if (e.code !== 'Space') return;
+      const el = document.activeElement, tag = el && el.tagName;
+      if (['BUTTON', 'INPUT', 'TEXTAREA', 'A'].includes(tag) || (el && el.isContentEditable)) return;
+      e.preventDefault();
+      if (e.type === 'keydown') { if (e.repeat || this.state.recording) return; this.holdMode = true; this.startRec(this.defaultTarget()); }
+      else if (this.holdMode) { this.holdMode = false; this.stopRec(); }
+    };
+    window.addEventListener('keydown', this.onKey); window.addEventListener('keyup', this.onKey);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this.onKey); window.removeEventListener('keyup', this.onKey); this.stopRec(); }
+  defaultTarget() { return this.state.view === 'ladder' ? { kind: 'rung', i: this.state.ladder.rung } : { kind: 'beat', key: this.state.active }; }
+  toast(t) { this.setState({ toast: t }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2600); }
+  setDraft(k, v) { const draft = { ...this.state.draft, [k]: v }; this.setState({ draft, draftAt: Date.now(), justSaved: false }); save('draft', draft); }
+  demoFill() {
+    const draft = { sense: 'In the design review, the PM read our onboarding copy aloud and stumbled on the third screen. Nobody said anything, but two people looked at their laptops.',
+      did: 'I cut the third screen entirely instead of rewording it, and moved its one useful line — “you can change this later” — under the button on screen two. Eng pushed back that it broke the progress dots; we dropped the dots too.',
+      story: 'We had a screen nobody could read aloud without stumbling, and we all pretended that was fine. Until the PM stumbled in front of the room. Because of that, I deleted it rather than polished it. Onboarding went from four screens to three and completion rose 6% the next week.',
+      durations: { sense: 22, did: 41, story: 58 } };
+    this.setState({ draft, draftAt: Date.now(), active: 'story', titling: false, justSaved: false }); save('draft', draft);
+    this.toast('Sample day filled — now hit “Save today’s entry”');
+  }
+  setLadder(p) { this.setState({ ladder: { ...this.state.ladder, ...p } }); }
+  setEntries(entries) { this.setState({ entries }); save('entries', entries); }
+
+  // ── recording ──
+  startRec(target) {
+    if (this.state.recording) return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+    this.target = target; this.want = true; this.recStart = Date.now();
+    this.setState({ recording: true, recTarget: target, interim: '', elapsed: 0, micError: null, active: target.kind === 'beat' ? target.key : this.state.active });
+    this.timer = setInterval(() => this.setState({ elapsed: (Date.now() - this.recStart) / 1000 }), 250);
+    const r = new SR(); r.continuous = true; r.interimResults = true; r.lang = navigator.language || 'en-US';
+    r.onresult = ev => { let interim = ''; for (let i = ev.resultIndex; i < ev.results.length; i++) { const res = ev.results[i]; if (res.isFinal) this.appendText(res[0].transcript.trim()); else interim += res[0].transcript; } this.setState({ interim }); };
+    r.onerror = ev => {
+      if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed' || ev.error === 'audio-capture') {
+        this.want = false; this.stopRec();
+        this.setState({ micError: 'Microphone blocked. An embedded frame can’t ask for it — open the page in its own tab, or allow the mic in the address bar. Typing still works.' });
+      }
+    };
+    r.onend = () => { if (this.want) { try { r.start(); } catch (e) {} } };
+    try { r.start(); } catch (e) {}
+    this.rec = r; this.startMeter();
+  }
+  // ── audio clips ──
+  startCapture(stream) {
+    if (!window.MediaRecorder || !this.keepAudio()) return;
+    try {
+      const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'].find(m => MediaRecorder.isTypeSupported(m)) || '';
+      const mr = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined); const chunks = []; const tg = this.target;
+      mr.ondataavailable = ev => { if (ev.data && ev.data.size) chunks.push(ev.data); };
+      mr.onstop = () => { if (!chunks.length) return; const blob = new Blob(chunks, { type: mr.mimeType || 'audio/webm' }); const key = tg.kind === 'beat' ? 'draft:' + tg.key : 'ladder:' + tg.i;
+        audioDB.put(key, blob).then(() => { if (tg.kind === 'beat') { const clips = { ...(this.state.draft.clips || {}), [tg.key]: { size: blob.size, type: blob.type, at: Date.now() } }; this.setDraft('clips', clips); } this.refreshClipUrl(key); }); };
+      mr.start(250); this.mr = mr;
+    } catch (e) { this.captureFailed = true; this.setState({ micError: 'Audio recorder failed to start (' + (e && e.message || e) + '). Transcription still works.' }); }
+  }
+  replayAll(cur) {
+    if (this.state.replaying) { this.stopReplay(); return; }
+    const keys = BEATS.filter(b => cur.clips && cur.clips[b.key]).map(b => ({ key: cur.id + ':' + b.key, beat: b.key }));
+    if (!keys.length) return;
+    this.setState({ replaying: true, replayBeat: keys[0].beat });
+    const playNext = i => {
+      if (i >= keys.length || !this.state.replaying) { this.stopReplay(); return; }
+      audioDB.get(keys[i].key).then(blob => { if (!blob) return playNext(i + 1);
+        const a = new Audio(URL.createObjectURL(blob)); this.replayAudio = a; this.setState({ replayBeat: keys[i].beat });
+        a.onended = () => { URL.revokeObjectURL(a.src); playNext(i + 1); }; a.onerror = () => playNext(i + 1); a.play().catch(() => playNext(i + 1)); });
+    };
+    playNext(0);
+  }
+  stopReplay() { if (this.replayAudio) { try { this.replayAudio.pause(); } catch (e) {} this.replayAudio = null; } this.setState({ replaying: false, replayBeat: null }); }
+  keepAudio() { const v = load('keepAudio', null); return v == null ? (this.props.keepAudio ?? true) : v; }
+  stopCapture() { if (this.mr && this.mr.state !== 'inactive') { try { this.mr.stop(); } catch (e) {} } this.mr = null; }
+  refreshClipUrl(key) {
+    audioDB.get(key).then(blob => { const urls = { ...(this.state.clipUrls || {}) }; if (urls[key]) URL.revokeObjectURL(urls[key]); if (blob) urls[key] = URL.createObjectURL(blob); else delete urls[key]; this.setState({ clipUrls: urls }); }).catch(() => {});
+  }
+  ensureClipUrls(keys) { const urls = this.state.clipUrls || {}; keys.forEach(k => { if (!(k in urls) && !this.pending?.has(k)) { (this.pending = this.pending || new Set()).add(k); this.refreshClipUrl(k); } }); }
+  deleteClip(key, entryId, beat) {
+    audioDB.del(key).then(() => { this.refreshClipUrl(key);
+      if (entryId) this.setEntries(this.state.entries.map(x => { if (x.id !== entryId) return x; const clips = { ...(x.clips || {}) }; delete clips[beat]; return { ...x, clips }; }));
+      else { const clips = { ...(this.state.draft.clips || {}) }; delete clips[beat]; this.setDraft('clips', clips); }
+      this.toast('Recording deleted'); });
+  }
+  appendText(t) {
+    if (!t) return; const tg = this.target; const join = (a, b) => a ? a.replace(/\s*$/, ' ') + b : b;
+    if (tg.kind === 'beat') this.setDraft(tg.key, join(this.state.draft[tg.key], t));
+    else { const texts = { ...this.state.ladder.texts }; texts[tg.i] = join(texts[tg.i], t); this.setLadder({ texts }); }
+  }
+  stopRec() {
+    if (!this.state.recording) return;
+    this.want = false; try { this.rec && this.rec.stop(); } catch (e) {} clearInterval(this.timer);
+    const sec = (Date.now() - this.recStart) / 1000, tg = this.target;
+    if (this.keepAudio() && !this.mr && !this.captureFailed && sec > 1) this.toast('No audio captured — microphone stream unavailable');
+    if (tg.kind === 'beat') { const d = { ...this.state.draft.durations }; d[tg.key] = (d[tg.key] || 0) + sec; this.setDraft('durations', d); }
+    else { const d = { ...this.state.ladder.durations }; d[tg.i] = (d[tg.i] || 0) + sec; this.setLadder({ durations: d }); }
+    this.setState({ recording: false, recTarget: null, interim: '', level: 0 }); this.stopMeter();
+  }
+  toggleRec(target) { if (this.state.recording) this.stopRec(); else { this.holdMode = false; this.startRec(target); } }
+  startMeter() {
+    if (!navigator.mediaDevices) return;
+    this.captureFailed = false;
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      if (!this.state.recording) { stream.getTracks().forEach(t => t.stop()); return; }
+      this.stream = stream; this.startCapture(stream); const ctx = new (window.AudioContext || window.webkitAudioContext)(); this.actx = ctx;
+      const an = ctx.createAnalyser(); an.fftSize = 512; ctx.createMediaStreamSource(stream).connect(an);
+      const buf = new Uint8Array(an.fftSize); let last = 0;
+      const loop = () => { if (!this.stream) return; an.getByteTimeDomainData(buf); let sum = 0; for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; sum += v * v; }
+        const now = performance.now(); if (now - last > 80) { last = now; this.setState({ level: Math.min(1, Math.sqrt(sum / buf.length) * 4) }); } this.raf = requestAnimationFrame(loop); };
+      loop();
+    }).catch(err => {
+      this.captureFailed = true;
+      if (this.keepAudio()) this.setState({ micError: 'Transcribing works, but the browser refused the raw microphone stream (' + (err && err.name || 'blocked') + '), so no audio can be saved here. Open the page in its own tab and allow the mic to keep voice recordings.' });
+    });
+  }
+  stopMeter() { this.stopCapture(); cancelAnimationFrame(this.raf); if (this.stream) { this.stream.getTracks().forEach(t => t.stop()); this.stream = null; } if (this.actx) { this.actx.close(); this.actx = null; } }
+
+  // ── claude ──
+  async claude(prompt, system) {
+    if (!(window.claude && window.claude.complete)) throw new Error('no claude');
+    return await window.claude.complete({ messages: [{ role: 'user', content: prompt }], system, max_tokens: 400 });
+  }
+  async beginClose() {
+    const d = this.state.draft;
+    const missing = BEATS.filter(b => !(d[b.key] || '').trim());
+    if (missing.length) {
+      this.setState({ missing: missing.map(b => b.key), active: missing[0].key });
+      this.toast('Needs ' + missing.map(b => b.label).join(' and ') + ' — three beats make an entry');
+      const el = document.querySelector('[data-beat="' + missing[0].key + '"] textarea'); if (el) el.focus();
+      clearTimeout(this.mt); this.mt = setTimeout(() => this.setState({ missing: [] }), 2400);
+      return;
+    }
+    const fb = fallbackTitle(d.story);
+    this.setState({ titling: true, title: fb, titleBusy: true });
+    try {
+      const t = await this.claude(`Sense: ${d.sense}\n\nDid: ${d.did}\n\nStory: ${d.story}`, 'You title a designer’s daily storytelling entry. Reply with only a title: at most 8 words, sentence case, no quotes, no trailing period. Prefer the tension or the turn over a summary.');
+      const clean = t.trim().split('\n')[0].replace(/^["“']|["”']$/g, '').slice(0, 80);
+      if (clean && this.state.titling && this.state.title === fb) this.setState({ title: clean });
+    } catch (e) {}
+    this.setState({ titleBusy: false });
+  }
+  saveEntry() {
+    const d = this.state.draft, now = new Date();
+    const e = { id: dayKey(now) + '-' + Math.random().toString(36).slice(2, 8), date: dayKey(now), createdAt: now.toISOString(),
+      title: (this.state.title || '').trim() || fallbackTitle(d.story), project: (this.state.project || '').trim(),
+      sense: d.sense.trim(), did: d.did.trim(), story: d.story.trim(), durations: { sense: Math.round(d.durations.sense || 0), did: Math.round(d.durations.did || 0), story: Math.round(d.durations.story || 0) }, scores: null };
+    e.clips = { ...(d.clips || {}) };
+    Object.keys(e.clips).forEach(k => audioDB.get('draft:' + k).then(blob => blob && audioDB.put(e.id + ':' + k, blob).then(() => audioDB.del('draft:' + k).then(() => this.refreshClipUrl('draft:' + k)))));
+    this.setEntries([e, ...this.state.entries]);
+    const draft = { sense: '', did: '', story: '', durations: {} }; this.setState({ draft, titling: false, title: '', project: '', active: 'sense', view: 'reader', openId: e.id, prevView: 'today', justSaved: true, justSavedId: e.id }); save('draft', draft);
+    this.toast('Saved to the shelf — here’s your entry');
+  }
+  async scoreEntry() {
+    const e = this.current(); if (!e) return;
+    this.setState({ scoring: true });
+    const scores = await this.scoreText(e);
+    this.setEntries(this.state.entries.map(x => x.id === e.id ? { ...x, scores, scoresStale: false } : x)); this.setState({ scoring: false });
+  }
+  async scoreVersion(at) {
+    const e = this.current(); const v = e && (e.versions || []).find(v => v.at === at); if (!v) return;
+    this.setState({ scoringVersion: at });
+    const scores = await this.scoreText(v);
+    this.setEntries(this.state.entries.map(x => x.id === e.id ? { ...x, versions: x.versions.map(w => w.at === at ? { ...w, scores } : w) } : x)); this.setState({ scoringVersion: null });
+  }
+  async scoreText(e) {
+    let scores;
+    try {
+      const t = await this.claude(`Sense: ${e.sense}\n\nDid: ${e.did}\n\nStory: ${e.story}`,
+        'You score a designer’s spoken storytelling rep on six axes, 1–5 each: stakes (did anything hang on this?), specificity (real names, numbers, moments), structure (a turn, not a chronology), self (narrator’s own role legible), sowhat (the ending lands somewhere), compression (would survive being cut in half). Never give an overall grade. Reply with only JSON: {"stakes":n,"specificity":n,"structure":n,"self":n,"sowhat":n,"compression":n,"note":"one sentence: the single most useful improvement"}');
+      const j = JSON.parse(t.match(/\{[\s\S]*\}/)[0]); scores = {}; AXES.forEach(a => scores[a.key] = Math.max(1, Math.min(5, Math.round(+j[a.key] || 1)))); scores.note = String(j.note || '');
+    } catch (err) { scores = heuristicScores(e); }
+    return scores;
+  }
+  current() { return this.state.entries.find(e => e.id === this.state.openId); }
+  md(e) { return `# ${e.title}\n\n${e.date}${e.project ? ' · ' + e.project : ''}\n\n## Sense\n${e.sense}\n\n## Did\n${e.did}\n\n## Story\n${e.story}\n`; }
+  threadsOf(entries) {
+    const m = new Map(); entries.forEach(e => { const k = e.project || e.title; if (!m.has(k)) m.set(k, []); m.get(k).push(e); });
+    return [...m.entries()].map(([name, list]) => ({ name, list, spoken: list.reduce((s, e) => s + Object.values(e.durations || {}).reduce((a, b) => a + b, 0), 0) }));
+  }
+  scoreColor(v, i) { return i < v ? (v >= 4 ? 'var(--color-accent)' : 'var(--color-accent-600)') : 'var(--color-neutral-800)'; }
+
+  renderVals() {
+    const s = this.state, p = this.props;
+    const showStreak = p.showStreak ?? true, contentFirst = p.contentFirstShelf ?? false, quiet = p.quietRecording ?? false;
+    const go = v => () => { if (s.recording) this.stopRec(); if (s.replaying) this.stopReplay(); this.setState({ view: v, ladderFrom: v === 'ladder' && s.view !== 'ladder' ? { view: s.view, openId: s.openId, prevView: s.prevView } : s.ladderFrom }); };
+    const open = id => () => { if (s.recording) this.stopRec(); if (s.replaying) this.stopReplay(); this.setState({ view: 'reader', openId: id, prevView: s.view }); };
+    const today = dayKey(new Date());
+    const dates = new Set(s.entries.map(e => e.date));
+    let streak = 0; { const d = new Date(); if (!dates.has(dayKey(d))) d.setDate(d.getDate() - 1); while (dates.has(dayKey(d))) { streak++; d.setDate(d.getDate() - 1); } }
+    const recBeat = s.recording && s.recTarget.kind === 'beat' ? s.recTarget.key : null;
+    const filled = k => !!(s.draft[k] || '').trim();
+    const missingSet = new Set(s.missing || []);
+    const beats = BEATS.map(b => {
+      const isRec = recBeat === b.key, isActive = s.active === b.key, dur = (s.draft.durations[b.key] || 0) + (isRec ? s.elapsed : 0), isMissing = missingSet.has(b.key);
+      const dk = 'draft:' + b.key, hasClip = !!(s.draft.clips && s.draft.clips[b.key]); if (hasClip) this.ensureClipUrls([dk]);
+      return { ...b, value: s.draft[b.key] || '', isActive, isRecording: isRec, filled: filled(b.key),
+        hasClip: hasClip && !isRec && !!(s.clipUrls || {})[dk], clipUrl: (s.clipUrls || {})[dk] || '', deleteClip: ev => { ev.stopPropagation(); this.deleteClip(dk, null, b.key); },
+        railColor: filled(b.key) ? 'var(--color-accent)' : 'var(--color-neutral-400)',
+        stateLabel: isMissing ? 'needed' : filled(b.key) ? 'draft saved' : 'empty', stateColor: isMissing ? 'var(--color-neutral-100)' : filled(b.key) ? 'var(--color-accent-300)' : 'inherit',
+        ring: isMissing ? 'inset 0 0 0 1px var(--color-neutral-200), 0 0 24px color-mix(in srgb, var(--color-neutral-100) 15%, transparent)' : isRec ? 'inset 0 0 0 1px var(--color-accent-400), 0 0 24px color-mix(in srgb, var(--color-accent) 25%, transparent)' : isActive ? 'inset 0 0 0 1px var(--color-accent-600)' : 'inset 0 0 0 1px transparent',
+        timer: fmt(dur), wordLabel: words(s.draft[b.key]) + ' words', interim: s.interim, showInterim: isRec && !quiet,
+        recLabel: isRec ? 'Stop' : 'Record', btnClass: isRec ? 'btn-secondary' : 'btn-primary', disabled: !s.speechSupported || (s.recording && !isRec),
+        btnBg: isRec ? 'var(--color-accent)' : '#1e2129', btnColor: '#f4f3ee',
+        spaceHint: !s.speechSupported ? '' : isRec ? 'release Space to stop' : isActive ? 'hold Space to record' : 'click, then hold Space',
+        onFocus: () => { if (s.active !== b.key && !s.recording) this.setState({ active: b.key }); },
+        onChange: ev => this.setDraft(b.key, ev.target.value),
+        onClear: ev => { ev.stopPropagation(); const durations = { ...s.draft.durations }; delete durations[b.key]; const clips = { ...(s.draft.clips || {}) }; delete clips[b.key]; audioDB.del(dk).then(() => this.refreshClipUrl(dk)); const draft = { ...s.draft, [b.key]: '', durations, clips }; this.setState({ draft, draftAt: Date.now() }); save('draft', draft); this.toast(b.label + ' cleared'); },
+        onRecord: ev => { ev.stopPropagation(); this.toggleRec({ kind: 'beat', key: b.key }); } };
+    });
+    const allFilled = BEATS.every(b => filled(b.key));
+    const missing = BEATS.filter(b => !filled(b.key)).map(b => b.label);
+    const filledCount = 3 - missing.length, hasDraft = filledCount > 0;
+    const savedToday = s.entries.some(e => e.date === today);
+    const justSaved = !!s.justSaved && !hasDraft;
+    const stepIdx = justSaved ? 3 : s.titling ? 1 : 0;
+    const steps = [
+      { n: '1', label: 'Tell three beats', sub: 'Speak or type Sense, Did, Story. Drafts save as you go.', icon: 'M128 176a48 48 0 0 0 48-48V64a48 48 0 0 0-96 0v64a48 48 0 0 0 48 48Zm-32-112a32 32 0 0 1 64 0v64a32 32 0 0 1-64 0Zm40 143.6V232a8 8 0 0 1-16 0v-24.4A80.1 80.1 0 0 1 48 128a8 8 0 0 1 16 0a64 64 0 0 0 128 0a8 8 0 0 1 16 0a80.1 80.1 0 0 1-72 79.6Z' },
+      { n: '2', label: 'Save today’s entry', sub: 'Title it, thread it to a project.', icon: 'M219.3 80l-43.3-43.3A15.9 15.9 0 0 0 164.7 32H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V91.3a15.9 15.9 0 0 0-4.7-11.3ZM168 208H88v-56h80Zm40 0h-24v-56a16 16 0 0 0-16-16H88a16 16 0 0 0-16 16v56H48V48h116.7L208 91.3Zm-48-136a8 8 0 0 1-8 8h-48a8 8 0 0 1 0-16h48a8 8 0 0 1 8 8Z' },
+      { n: '3', label: 'It lands on the shelf', sub: 'Score it, raid it in the Bank, retell it on the Ladder.', icon: 'M232 48H24a8 8 0 0 0 0 16h8v144a8 8 0 0 0 16 0v-8h160v8a8 8 0 0 0 16 0V64h8a8 8 0 0 0 0-16ZM48 184V64h160v120Zm40-104a8 8 0 0 0-8 8v56a8 8 0 0 0 8 8h24a8 8 0 0 0 8-8V88a8 8 0 0 0-8-8Zm64 0a8 8 0 0 0-8 8v56a8 8 0 0 0 8 8h24a8 8 0 0 0 8-8V88a8 8 0 0 0-8-8Z' }
+    ].map((st, i) => { const done = i < stepIdx, cur = i === stepIdx, h = STEP_HUES[i]; return { ...st, icon: done ? 'M229.7 77.7l-128 128a8 8 0 0 1-11.4 0l-56-56a8 8 0 0 1 11.4-11.4L96 188.7L218.3 66.3a8 8 0 0 1 11.4 11.4Z' : st.icon,
+      bg: cur ? h.dim : 'transparent', ring: cur ? 'inset 0 0 0 1px ' + h.main : 'inset 0 0 0 1px ' + h.dim, opacity: done || cur ? 1 : 0.7,
+      dotBg: done || cur ? h.main : h.dim, dotColor: done || cur ? 'var(--color-bg)' : h.main, accent: h.main }; });
+    const draftStatus = !hasDraft ? (savedToday ? 'Today’s entry is on the shelf. Another rep is welcome.' : 'Nothing drafted yet.') : filledCount + ' of 3 beats drafted · autosaved' + (s.draftAt ? ' ' + new Date(s.draftAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : ' locally');
+    const shelfCard = e => ({ ...e, open: open(e.id), dateLabel: niceDate(e.date), snippet: e.story || e.did,
+      titleSize: contentFirst ? 11 : 15, titleColor: contentFirst ? 'var(--color-neutral-500)' : 'var(--color-text)',
+      bodySize: contentFirst ? 14 : 12, bodyColor: contentFirst ? 'var(--color-text)' : 'var(--color-neutral-500)',
+      dots: AXES.map(a => ({ name: a.name, bg: e.scores ? this.scoreColor(e.scores[a.key], 2) : 'var(--color-neutral-900)' })) });
+    const sq = (s.shelfQuery || '').trim().toLowerCase();
+    const shelfOld = s.shelfOrder === 'oldest';
+    const shelfSorted = [...s.entries].sort((a, b) => shelfOld ? (a.createdAt < b.createdAt ? -1 : 1) : (a.createdAt < b.createdAt ? 1 : -1));
+    const shelfList = sq ? shelfSorted.filter(e => [e.title, e.sense, e.did, e.story, e.project].join(' ').toLowerCase().includes(sq)) : shelfSorted.slice(0, 8);
+    const scored = [...s.entries].filter(e => e.scores).sort((a, b) => a.createdAt < b.createdAt ? -1 : 1);
+    const trends = AXES.map(a => {
+      const vals = scored.map(e => e.scores[a.key]); const n = vals.length;
+      const pts = vals.map((v, i) => `${n > 1 ? (i / (n - 1)) * 100 : 50},${30 - ((v - 1) / 4) * 26}`).join(' ');
+      const half = Math.max(1, Math.floor(n / 2)); const avg = l => l.length ? l.reduce((x, y) => x + y, 0) / l.length : 0;
+      const d = n > 1 ? avg(vals.slice(-half)) - avg(vals.slice(0, n - half)) : 0;
+      return { name: a.name, points: pts, delta: n < 2 ? '—' : d > 0.2 ? '↑ ' + d.toFixed(1) : d < -0.2 ? '↓ ' + Math.abs(d).toFixed(1) : '→', deltaColor: d > 0.2 ? 'var(--color-accent)' : 'var(--color-neutral-500)', d };
+    });
+    const movers = trends.filter(t => t.d > 0.2).map(t => t.name);
+    const movementLabel = scored.length >= 2 ? (movers.length ? 'Moving up: ' + movers.join(', ') : 'Rubric steady across ' + scored.length + ' scored reps') : '';
+
+    // reader
+    const cur = this.current(); let reader = { fields: [], axes: [] };
+    if (cur) {
+      const tot = Object.values(cur.durations || {}).reduce((a, b) => a + b, 0);
+      reader = { title: cur.title, meta: [niceDate(cur.date), cur.project, tot ? fmt(tot) + ' spoken' : 'typed'].filter(Boolean).join(' · '),
+        fields: BEATS.map(b => { const ed = s.editField === b.key; const ck = cur.id + ':' + b.key; const hasClip = !!(cur.clips && cur.clips[b.key]); if (hasClip) this.ensureClipUrls([ck]);
+          return { n: b.n, label: b.label, text: cur[b.key], meta: (cur.durations && cur.durations[b.key] ? fmt(cur.durations[b.key]) + ' · ' : '') + words(cur[b.key]) + ' words',
+          hasClip: hasClip && !!(s.clipUrls || {})[ck], clipUrl: (s.clipUrls || {})[ck] || '', clipMeta: hasClip ? fmt(cur.durations && cur.durations[b.key] || 0) + ' · recorded ' + new Date(cur.clips[b.key].at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '',
+          deleteClip: () => confirm('Delete this recording? The text stays.') && this.deleteClip(ck, cur.id, b.key),
+          editing: ed, notEditing: !ed, draft: ed ? (s.editDraft || '') : '',
+          start: () => this.setState({ editField: b.key, editDraft: cur[b.key] }), onChange: ev => this.setState({ editDraft: ev.target.value }), cancel: () => this.setState({ editField: null }),
+          save: () => { const t = (s.editDraft || '').trim(); if (t && t !== cur[b.key]) { this.setEntries(s.entries.map(x => x.id === cur.id ? withVersion(x, { [b.key]: t }) : x)); this.toast(b.label + ' updated — previous version kept'); } this.setState({ editField: null, compareAt: null }); } }; }),
+        hasAnyClip: BEATS.some(b => cur.clips && cur.clips[b.key]), noClip: !BEATS.some(b => cur.clips && cur.clips[b.key]),
+        hasScores: !!cur.scores, noScores: !cur.scores, note: cur.scores && cur.scores.note, scoreSource: cur.scores ? 'scored by Claude' : 'unscored',
+        axes: AXES.map(a => ({ ...a, dots: [0, 1, 2, 3, 4].map(i => ({ bg: this.scoreColor(cur.scores ? cur.scores[a.key] : 0, i) })) })) };
+    }
+
+    // bank
+    const q = s.bankQuery.trim().toLowerCase();
+    const threadsAll = this.threadsOf(s.entries);
+    const dateHay = k => { const [y, m, d] = k.split('-').map(Number); const dt = new Date(y, m - 1, d);
+      return [k, k.slice(0, 7), dt.toLocaleDateString('en-US', { month: 'long' }), dt.toLocaleDateString('en-US', { month: 'short' }), dt.toLocaleDateString('en-US', { weekday: 'long' }), dt.toLocaleDateString('en-US', { weekday: 'short' }),
+        dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), dt.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }), dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), m + '/' + d, m + '/' + d + '/' + y, String(y)].join(' ').toLowerCase(); };
+    const rel = (() => { const t = new Date(); t.setHours(0, 0, 0, 0); const k = dayKey(t); const ago = n => dayKey(daysAgo(n));
+      if (q === 'today') return [k, k]; if (q === 'yesterday') return [ago(1), ago(1)]; if (q === 'this week' || q === 'last 7 days') return [ago(6), k]; if (q === 'last week') return [ago(13), ago(7)];
+      if (q === 'this month') return [k.slice(0, 8) + '01', k]; if (q === 'last month') { const d = new Date(t.getFullYear(), t.getMonth() - 1, 1); return [dayKey(d), dayKey(new Date(t.getFullYear(), t.getMonth(), 0))]; } return null; })();
+    const inRange = e => (!s.bankFrom || e.date >= s.bankFrom) && (!s.bankTo || e.date <= s.bankTo) && (!rel || (e.date >= rel[0] && e.date <= rel[1]));
+    const matchQ = e => !q || rel || [e.title, e.sense, e.did, e.story, e.project].join(' ').toLowerCase().includes(q) || dateHay(e.date).includes(q);
+    const threads = [{ name: 'All entries', key: null, count: s.entries.length }, ...threadsAll.map(t => ({ name: t.name, key: t.name, count: t.list.length }))].map(t => ({
+      ...t, count: t.count + (t.count === 1 ? ' entry' : ' entries'), select: () => this.setState({ bankThread: t.key, bankPage: 0 }),
+      bg: s.bankThread === t.key ? 'oklch(0.47 0.09 165 / 0.18)' : 'transparent', ring: s.bankThread === t.key ? 'inset 0 0 0 1px oklch(0.47 0.09 165), 0 0 14px oklch(0.47 0.09 165 / 0.35)' : 'none',
+      color: s.bankThread === t.key ? 'oklch(0.35 0.08 165)' : 'var(--color-text)', weight: s.bankThread === t.key ? 600 : 400 }));
+    const bankList = s.entries.filter(e => (!s.bankThread || (e.project || e.title) === s.bankThread) && (!s.bankUnscored || !e.scores) && inRange(e) && matchQ(e))
+      .sort((a, b) => s.bankSort === 'newest' ? (a.createdAt < b.createdAt ? 1 : -1) : s.bankSort === 'oldest' ? (a.createdAt < b.createdAt ? -1 : 1)
+        : ((b.scores ? b.scores[s.bankAxis] : 0) - (a.scores ? a.scores[s.bankAxis] : 0)) || (a.createdAt < b.createdAt ? 1 : -1))
+      .map(e => ({ ...shelfCard(e), axisLabel: e.scores ? AXES.find(a => a.key === s.bankAxis).name + ' ' + e.scores[s.bankAxis] + '/5' : 'Unscored',
+        axisBg: e.scores ? 'color-mix(in srgb, var(--color-accent) 18%, transparent)' : 'oklch(0.52 0.12 65 / 0.2)', axisColor: e.scores ? 'var(--color-accent-300)' : 'oklch(0.42 0.12 65)', axisRing: e.scores ? 'none' : 'inset 0 0 0 1px oklch(0.52 0.12 65 / 0.6)' }));
+    const pill = on => ({ color: on ? 'var(--color-bg)' : 'var(--color-neutral-300)', bg: on ? 'var(--color-accent)' : 'transparent', weight: on ? 600 : 400, ring: on ? '0 0 12px color-mix(in srgb, var(--color-accent) 45%, transparent)' : 'none' });
+    const sortOpts = [
+      { key: 'newest', name: 'Newest', icon: 'M128 24a104 104 0 1 0 104 104A104.1 104.1 0 0 0 128 24Zm0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88Zm64-88a8 8 0 0 1-8 8h-56a8 8 0 0 1-8-8V72a8 8 0 0 1 16 0v48h48a8 8 0 0 1 8 8Z' },
+      { key: 'oldest', name: 'Oldest', icon: 'M136 80v43.5l37.7 22.3a8 8 0 0 1-8.2 13.8l-41.6-24.6A8 8 0 0 1 120 128V80a8 8 0 0 1 16 0Zm-8-56a104.2 104.2 0 0 0-72 28.8V32a8 8 0 0 0-16 0v40a8 8 0 0 0 8 8h40a8 8 0 0 0 0-16H67.8A88 88 0 1 1 40 128a8 8 0 0 0-16 0a104 104 0 1 0 104-104Z' }
+    ].map(o => ({ ...o, ...pill(s.bankSort === o.key), select: () => this.setState({ bankSort: s.bankSort === o.key ? null : o.key, bankPage: 0 }) }));
+    const axisOpts = AXES.map(a => { const on = !s.bankSort && s.bankAxis === a.key; return { name: a.name, icon: AXIS_ICONS[a.key], select: () => this.setState({ bankAxis: a.key, bankSort: null, bankPage: 0 }),
+      color: on ? 'var(--color-bg)' : 'var(--color-neutral-300)', bg: on ? 'var(--color-accent)' : 'transparent', weight: on ? 600 : 400, ring: on ? '0 0 12px color-mix(in srgb, var(--color-accent) 45%, transparent)' : 'none' }; });
+    const bankThreadObj = threadsAll.find(t => t.name === s.bankThread);
+    const PAGE = 10, pageCount = Math.max(1, Math.ceil(bankList.length / PAGE)), page = Math.min(s.bankPage || 0, pageCount - 1);
+    const bankPage = bankList.slice(page * PAGE, page * PAGE + PAGE);
+    const setPage = n => () => { this.setState({ bankPage: Math.max(0, Math.min(pageCount - 1, n)) }); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    const bankPages = Array.from({ length: pageCount }, (_, i) => ({ n: i + 1, go: setPage(i), bg: i === page ? 'var(--color-accent)' : 'transparent', color: i === page ? 'var(--color-bg)' : 'var(--color-neutral-300)' }));
+
+    // ladder
+    const L = s.ladder; const thread = L.thread ? threadsAll.find(t => t.name === L.thread) : null;
+    const pickThread = name => () => this.setState({ view: 'ladder', ladderFrom: s.view === 'ladder' ? s.ladderFrom : { view: s.view, openId: s.openId, prevView: s.prevView }, ladder: { thread: name, rung: 0, texts: {}, durations: {} }, bankThread: null });
+    const ladderBack = () => { if (s.recording) this.stopRec(); if (thread) { this.setLadder({ thread: null }); return; } const f = s.ladderFrom; this.setState(f && f.view !== 'ladder' ? { view: f.view, openId: f.openId, prevView: f.prevView, ladderFrom: null } : { view: 'today', ladderFrom: null }); };
+    const ladderBackLabel = thread ? 'All threads' : s.ladderFrom && s.ladderFrom.view === 'reader' ? 'Back to entry' : s.ladderFrom && s.ladderFrom.view === 'bank' ? 'Back to Story Bank' : 'Back to Today';
+    const lq = (s.ladderQuery || '').trim().toLowerCase();
+    const ladderThreads = threadsAll.filter(t => !lq || t.name.toLowerCase().includes(lq) || t.list.some(e => [e.title, e.sense, e.did, e.story].join(' ').toLowerCase().includes(lq))).map(t => ({ name: t.name, count: t.list.length + (t.list.length === 1 ? ' entry' : ' entries'), summary: t.list[0].title + (t.list.length > 1 ? ' · ' + t.list[t.list.length - 1].title : ''), baseline: t.spoken ? fmt(t.spoken) + ' spoken across the thread' : 'typed entries — no spoken baseline', pick: pickThread(t.name) }));
+    const recRung = s.recording && s.recTarget.kind === 'rung' ? s.recTarget.i : -1;
+    const rungs = RUNGS.map((r, i) => {
+      const txt = L.texts[i] || '', unlocked = i === 0 || !!(L.texts[i - 1] || '').trim(), isRec = recRung === i, dur = (L.durations[i] || 0) + (isRec ? s.elapsed : 0), over = dur - r.sec;
+      return { ...r, value: txt, unlocked, locked: !unlocked, isRecording: isRec, interim: s.interim, showInterim: isRec && !quiet, minH: [72, 120, 200][i], placeholder: r.ph,
+        ring: isRec ? 'inset 0 0 0 1px var(--color-accent-400)' : L.rung === i && unlocked ? 'inset 0 0 0 1px var(--color-accent-600)' : 'inset 0 0 0 1px transparent', opacity: unlocked ? 1 : 0.55,
+        numColor: txt.trim() ? 'var(--color-accent)' : 'var(--color-text)', timer: fmt(dur) + ' / ' + fmt(r.sec), wordLabel: words(txt) + ' words',
+        pct: Math.min(100, (dur / r.sec) * 100), barColor: over > 0 ? 'var(--color-neutral-300)' : 'var(--color-accent)', overLabel: over > 0 ? '+' + fmt(over) + ' over' : (isRec ? 'release Space to stop' : L.rung === i && s.speechSupported ? 'hold Space to record' : ''),
+        recLabel: isRec ? 'Stop' : 'Record', btnClass: isRec ? 'btn-secondary' : 'btn-primary', disabled: !s.speechSupported || (s.recording && !isRec),
+        onFocus: () => { if (!s.recording) this.setLadder({ rung: i }); }, onChange: ev => this.setLadder({ texts: { ...L.texts, [i]: ev.target.value } }),
+        onRecord: () => { this.setLadder({ rung: i }); this.toggleRec({ kind: 'rung', i }); } };
+    });
+    const doneRungs = RUNGS.filter((r, i) => (L.texts[i] || '').trim()).length;
+    const w0 = words(L.texts[0]), wMax = Math.max(1, ...RUNGS.map((r, i) => words(L.texts[i])));
+    const compareRows = RUNGS.map((r, i) => ({ name: r.name, pct: (words(L.texts[i]) / wMax) * 100, meta: words(L.texts[i]) ? words(L.texts[i]) + ' w · ' + fmt(L.durations[i] || 0) : '—' }));
+    const runsForThread = s.runs.filter(r => r.thread === L.thread);
+    const saveRun = () => { const run = { thread: L.thread, date: today, texts: L.texts, durations: L.durations }; const runs = [run, ...s.runs]; this.setState({ runs }); save('runs', runs); this.toast('Run saved — ' + words(L.texts[0]) + ' words at 30 s'); };
+
+    return {
+      isToday: s.view === 'today', isReader: s.view === 'reader', isBank: s.view === 'bank', isLadder: s.view === 'ladder',
+      ...(() => { const o = {}; [['Today', 'today'], ['Bank', 'bank'], ['Ladder', 'ladder']].forEach(([n, v]) => { const on = s.view === v || (v === 'today' && s.view === 'reader' && (s.prevView || 'today') === 'today');
+        o['nav' + n + 'Color'] = on ? 'var(--color-bg)' : 'var(--color-neutral-300)'; o['nav' + n + 'Bg'] = on ? 'var(--color-accent-200)' : 'var(--color-neutral-900)'; o['nav' + n + 'Ring'] = on ? '0 0 16px color-mix(in srgb, var(--color-accent) 35%, transparent)' : 'inset 0 0 0 1px var(--color-neutral-800)'; }); return o; })(),
+      goToday: go('today'), goBank: go('bank'), goLadder: go('ladder'),
+      curToday: s.view === 'today' || (s.view === 'reader' && (s.prevView || 'today') === 'today') ? 'page' : undefined, curBank: s.view === 'bank' ? 'page' : undefined, curLadder: s.view === 'ladder' ? 'page' : undefined,
+      todayLabel: new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }), showStreak, streak, repCount: s.entries.length, micNotice: s.micError,
+      beats, level: Math.round(s.level * 100), notTitling: !s.titling, titling: s.titling,
+      steps, draftStatus, hasDraft, demoFill: () => this.demoFill(),
+      ...(() => { const on = this.keepAudio(); return { keepAudioOn: on, keepAudioTitle: on ? 'Audio is saved with each beat' : 'Text only', keepAudioLabel: on ? (this.captureFailed ? 'Voice saving blocked here' : 'Saving voice recordings') : 'Voice recordings off',
+        keepAudioBg: on ? 'var(--color-accent-900)' : 'var(--color-neutral-900)', keepAudioColor: on ? 'var(--color-accent-300)' : 'var(--color-neutral-400)', keepAudioBorder: on ? 'var(--color-accent)' : 'var(--color-neutral-700)',
+        keepAudioTrack: on ? 'var(--color-accent)' : 'var(--color-neutral-600)', keepAudioKnob: on ? 16 : 2,
+        toggleKeepAudio: () => { save('keepAudio', !on); this.forceUpdate(); this.toast(!on ? 'Voice recordings will be saved with each beat' : 'Voice recordings off — text only'); } }; })(),
+      progressSegs: [
+        { pct: justSaved ? 100 : (filledCount / 3) * 100 },
+        { pct: s.titling ? 60 : justSaved ? 100 : 0 },
+        { pct: justSaved ? 100 : 0 }
+      ].map((sg, i) => ({ ...sg, color: STEP_HUES[i].main, track: sg.pct > 0 ? STEP_HUES[i].dim : 'var(--color-neutral-800)' })),
+      progressLabel: s.titling ? 'Titling' : justSaved ? 'Saved' : filledCount + ' / 3 beats',
+      progressColor: allFilled || justSaved ? 'var(--color-accent)' : 'var(--color-text)',
+      clearDraft: () => { const draft = { sense: '', did: '', story: '', durations: {} }; this.setState({ draft, draftAt: null, active: 'sense' }); save('draft', draft); },
+      saveGlow: allFilled ? '0 0 28px color-mix(in srgb, var(--color-accent) 55%, transparent), 0 4px 14px rgba(30,33,41,0.2)' : '0 4px 14px rgba(30,33,41,0.2)',
+      gateColor: allFilled ? 'var(--color-accent-300)' : 'var(--color-neutral-400)',
+      gateLabel: allFilled ? 'All three beats drafted — ready to save.' : 'Still needs ' + missing.join(' and ') + '. A two-beat entry is not a story.',
+      beginClose: () => this.beginClose(), cancelClose: () => this.setState({ titling: false }), saveEntry: () => this.saveEntry(),
+      title: s.title, onTitle: ev => this.setState({ title: ev.target.value }), titleStatus: s.titleBusy ? 'Titling…' : 'Title', project: s.project, onProject: ev => this.setState({ project: ev.target.value }),
+      projectNames: [...new Set(s.entries.map(e => e.project).filter(Boolean))],
+      entryCountLabel: s.entries.length + (s.entries.length === 1 ? ' entry' : ' entries'), movementLabel, shelf: shelfList.map(shelfCard), shelfEmpty: shelfList.length === 0,
+      shelfNewest: () => this.setState({ shelfOrder: 'newest' }), shelfOldest: () => this.setState({ shelfOrder: 'oldest' }),
+      shelfNewestColor: shelfOld ? 'var(--color-neutral-300)' : 'var(--color-bg)', shelfNewestBg: shelfOld ? 'transparent' : 'var(--color-accent)', shelfNewestWeight: shelfOld ? 400 : 600,
+      shelfOldestColor: shelfOld ? 'var(--color-bg)' : 'var(--color-neutral-300)', shelfOldestBg: shelfOld ? 'var(--color-accent)' : 'transparent', shelfOldestWeight: shelfOld ? 600 : 400,
+      shelfSearchOpen: !!s.shelfSearchOpen, shelfQuery: s.shelfQuery || '', onShelfQuery: ev => this.setState({ shelfQuery: ev.target.value }),
+      toggleShelfSearch: () => this.setState({ shelfSearchOpen: !s.shelfSearchOpen, shelfQuery: s.shelfSearchOpen ? '' : (s.shelfQuery || '') }),
+      shelfSearchColor: s.shelfSearchOpen || s.shelfQuery ? 'var(--color-accent)' : 'var(--color-neutral-400)',
+      readerEditing: !!s.readerEditing, readerNotEditing: !s.readerEditing, readerTitleDraft: s.readerTitleDraft || '',
+      startReaderTitle: () => this.setState({ readerEditing: true, readerTitleDraft: cur ? cur.title : '' }),
+      onReaderTitle: ev => this.setState({ readerTitleDraft: ev.target.value }),
+      cancelReaderTitle: () => this.setState({ readerEditing: false }),
+      saveReaderTitle: () => { const t = (s.readerTitleDraft || '').trim(); if (cur && t && t !== cur.title) { this.setEntries(s.entries.map(x => x.id === cur.id ? withVersion(x, { title: t }) : x)); this.toast('Title updated — previous version kept'); } this.setState({ readerEditing: false }); },
+      onReaderTitleKey: ev => { if (ev.key === 'Enter') { ev.preventDefault(); const t = (ev.target.value || '').trim(); if (cur && t && t !== cur.title) { this.setEntries(s.entries.map(x => x.id === cur.id ? withVersion(x, { title: t }) : x)); this.toast('Title updated — previous version kept'); } this.setState({ readerEditing: false }); } else if (ev.key === 'Escape') this.setState({ readerEditing: false }); },
+      ...(() => {
+        // backfill: a version saved before scores were snapshotted inherits the entry's stale score (it rated that text)
+        const vs = cur ? (cur.versions || []).map((v, i) => (!v.scores && cur.scores && cur.scoresStale && i === 0) ? { ...v, scores: cur.scores, inherited: true } : v) : [];
+        const sel = vs.find(v => v.at === s.compareAt) || null;
+        const chip = on => ({ border: on ? 'var(--color-accent)' : 'var(--color-neutral-700)', bg: on ? 'var(--color-accent)' : 'transparent', color: on ? '#f4f3ee' : 'var(--color-neutral-300)', weight: on ? 600 : 400 });
+        const fmtAt = at => new Date(at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        const cnt = (toks, k) => toks.filter(t => t.kind === k).reduce((n, t) => n + words(t.text), 0);
+        const compareFields = sel ? BEATS.map(b => { const toks = wordDiff(sel[b.key], cur[b.key]); const a = cnt(toks, 'add'), d = cnt(toks, 'del'); return { label: b.label, tokens: toks, summary: a || d ? (a ? '+' + a + ' ' : '') + (d ? '−' + d : '') + ' words' : 'unchanged' }; }) : [];
+        return { hasVersions: vs.length > 0, versionCount: vs.length + (vs.length === 1 ? ' earlier version' : ' earlier versions'),
+          versions: vs.map((v, i) => ({ ...chip(!!sel && sel.at === v.at), label: 'v' + (vs.length - i) + ' · ' + fmtAt(v.at), select: () => this.setState({ compareAt: sel && sel.at === v.at ? null : v.at }) })),
+          currentChip: chip(!sel), selectCurrent: () => this.setState({ compareAt: null }), comparing: !!sel, compareLabel: sel ? 'v' + (vs.length - vs.indexOf(sel)) + ' · ' + fmtAt(sel.at) : '',
+          compareTitleChanged: !!sel && sel.title !== cur.title, compareTitleTokens: sel ? wordDiff(sel.title, cur.title) : [], compareFields,
+          restoreVersion: () => { if (!sel) return; this.setEntries(s.entries.map(x => x.id === cur.id ? { ...withVersion(x, { title: sel.title, sense: sel.sense, did: sel.did, story: sel.story }), scores: sel.scores || null, scoresStale: false } : x)); this.setState({ compareAt: null }); this.toast('Restored — the replaced version is kept in history'); },
+          rubricRows: sel ? AXES.map(a => { const o = sel.scores ? sel.scores[a.key] : null, n = cur.scores ? cur.scores[a.key] : null; const d = o != null && n != null ? n - o : null;
+            return { name: a.name, oldDots: [0, 1, 2, 3, 4].map(i => ({ bg: this.scoreColor(o || 0, i) })), newDots: [0, 1, 2, 3, 4].map(i => ({ bg: this.scoreColor(n || 0, i) })), oldVal: o != null ? o + '/5' : '—', newVal: n != null ? n + '/5' : '—',
+              delta: d == null ? '' : d > 0 ? '+' + d : d < 0 ? String(d) : '=', deltaColor: d > 0 ? 'oklch(0.47 0.09 165)' : d < 0 ? 'oklch(0.45 0.12 25)' : 'var(--color-neutral-400)' }; }) : [],
+          oldNote: sel && sel.scores ? (sel.inherited ? '(score carried over from before the edit) ' : '') + (sel.scores.note || '') : '', newNote: cur && cur.scores ? cur.scores.note : '',
+          oldUnscored: !!sel && !sel.scores, newUnscored: !!cur && !cur.scores, newStale: !!cur && !!cur.scoresStale,
+          scoreOldLabel: s.scoringVersion === (sel && sel.at) ? 'Scoring…' : 'Score this version', scoreOld: () => sel && this.scoreVersion(sel.at), scoringOld: !!s.scoringVersion,
+          scoreNewLabel: s.scoring ? 'Scoring…' : (cur && cur.scores ? 'Re-score current' : 'Score current'),
+          rubricSum: sel && sel.scores && cur.scores ? (() => { const t = AXES.reduce((n, a) => n + (cur.scores[a.key] - sel.scores[a.key]), 0); return t > 0 ? 'Up ' + t + ' points overall' : t < 0 ? 'Down ' + Math.abs(t) + ' points overall' : 'Same total — see per-axis movement'; })() : '' };
+      })(),
+      replayAll: () => cur && this.replayAll(cur), replayIdle: !s.replaying, replayPlaying: !!s.replaying,
+      replayLabel: s.replaying ? 'Stop · playing ' + (BEATS.find(b => b.key === s.replayBeat) || {}).label : 'Replay my voice',
+      ...(() => { const has = cur && BEATS.some(b => cur.clips && cur.clips[b.key]); const n = cur ? BEATS.filter(b => cur.clips && cur.clips[b.key]).length : 0; const tot = cur ? BEATS.reduce((t, b) => t + (cur.clips && cur.clips[b.key] ? (cur.durations && cur.durations[b.key] || 0) : 0), 0) : 0;
+        return { voiceBg: has ? 'var(--color-accent-900)' : 'var(--color-neutral-900)', voiceBorder: has ? 'var(--color-accent-700)' : 'var(--color-neutral-800)',
+          voiceMeta: n + (n === 1 ? ' clip' : ' clips') + (tot ? ' · ' + fmt(tot) : '') + ' · plays Sense → Did → Story',
+          voiceHint: cur && Object.values(cur.durations || {}).some(v => v) ? 'It was spoken before audio saving existed, or with recordings turned off.' : 'It was typed. Record a beat with “Saving voice recordings” on and the replay appears here.' }; })(),
+      reader, readerJustSaved: justSaved && cur && cur.id === s.justSavedId, backFromReader: go(s.prevView || 'today'), scoring: s.scoring, scoreLabel: s.scoring ? 'Scoring…' : 'Score this rep', rescoreLabel: s.scoring ? 'Scoring…' : 'Re-score',
+      scoreEntry: () => this.scoreEntry(),
+      copyEntry: () => { if (cur) navigator.clipboard.writeText(this.md(cur)).then(() => this.toast('Copied as Markdown'), () => this.toast('Clipboard blocked')); },
+      exportEntry: () => { if (!cur) return; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([this.md(cur)], { type: 'text/markdown' })); a.download = cur.date + '-' + cur.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) + '.md'; a.click(); this.toast('Exported .md'); },
+      deleteEntry: () => { if (cur && confirm('Delete this entry?')) { Object.keys(cur.clips || {}).forEach(k => audioDB.del(cur.id + ':' + k)); this.setEntries(s.entries.filter(e => e.id !== cur.id)); this.setState({ view: s.prevView || 'today' }); this.toast('Entry deleted'); } },
+      readerToLadder: () => cur && pickThread(cur.project || cur.title)(),
+      bankQuery: s.bankQuery, onBankQuery: ev => this.setState({ bankQuery: ev.target.value, bankPage: 0 }),
+      bankFrom: s.bankFrom || '', bankTo: s.bankTo || '', onBankFrom: ev => this.setState({ bankFrom: ev.target.value, bankPage: 0 }), onBankTo: ev => this.setState({ bankTo: ev.target.value, bankPage: 0 }),
+      bankHasFilters: !!(q || s.bankFrom || s.bankTo), bankClearFilters: () => this.setState({ bankQuery: '', bankFrom: '', bankTo: '', bankPage: 0 }),
+      bankHint: q || s.bankFrom || s.bankTo ? bankList.length + (bankList.length === 1 ? ' match' : ' matches') : 'Try “Aug 30”, “last week”, “2026-08”', scoredCount: scored.length, trends, threads, bankList, bankPage, bankEmpty: bankList.length === 0, axisOpts, sortOpts,
+      unscoredOpt: s.bankUnscored ? { color: 'var(--color-bg)', bg: 'oklch(0.52 0.12 65)', weight: 600, ring: '0 0 12px oklch(0.52 0.12 65 / 0.5)' } : pill(false),
+      toggleUnscored: () => this.setState({ bankUnscored: !s.bankUnscored, bankPage: 0 }),
+      bankPaged: pageCount > 1, bankPages, bankPrev: setPage(page - 1), bankNext: setPage(page + 1), bankPrevDisabled: page === 0, bankNextDisabled: page >= pageCount - 1,
+      bankRangeLabel: (page * PAGE + 1) + '–' + Math.min(bankList.length, page * PAGE + PAGE) + ' of ' + bankList.length,
+      bankThreadLabel: bankThreadObj ? bankThreadObj.name : '', bankThreadToLadder: bankThreadObj ? pickThread(bankThreadObj.name) : () => {},
+      ladderBack, ladderBackLabel, ladderQuery: s.ladderQuery || '', onLadderQuery: ev => this.setState({ ladderQuery: ev.target.value }),
+      ladderThreadCount: ladderThreads.length + (ladderThreads.length === 1 ? ' thread' : ' threads'), ladderNoMatch: !!lq && ladderThreads.length === 0, ladderHeading: thread ? thread.name : 'Pick a thread to retell', ladderHasThread: !!thread, ladderPicking: !thread, ladderReset: () => { if (s.recording) this.stopRec(); this.setLadder({ thread: null }); },
+      ladderThreads, runsLabel: s.runs.length ? s.runs.length + (s.runs.length === 1 ? ' saved run' : ' saved runs') + ' so far' : '',
+      rungs, ladderSaveDisabled: doneRungs < 3, ladderGate: doneRungs < 3 ? doneRungs + ' of 3 rungs told' : 'All three rungs told' + (runsForThread.length ? ' · ' + runsForThread.length + ' earlier run' + (runsForThread.length > 1 ? 's' : '') + ' on this thread' : ''), saveRun,
+      ladderBaseline: thread ? (thread.spoken ? fmt(thread.spoken) : words(thread.list.map(e => e.story).join(' ')) + ' w') : '',
+      ladderBaselineNote: thread ? (thread.spoken ? 'spoken across ' + thread.list.length + (thread.list.length === 1 ? ' daily entry' : ' daily entries') + '. The 30-second rung keeps ' + Math.round((30 / Math.max(30, thread.spoken)) * 100) + '% of that time.' : 'words of story across ' + thread.list.length + ' typed entries.') : '',
+      compareRows, compareNote: doneRungs ? (w0 ? 'Your 30-second telling carries ' + w0 + ' words. Everything longer should add stakes, not process.' : 'Start at the top rung.') : 'Words per rung appear as you tell them.',
+      ladderSources: thread ? thread.list.map(e => ({ ...e, open: open(e.id), dateLabel: niceDate(e.date), spoken: Object.values(e.durations || {}).reduce((a, b) => a + b, 0) ? fmt(Object.values(e.durations).reduce((a, b) => a + b, 0)) + ' spoken' : 'typed' })) : [],
+      toast: s.toast
+    };
+  }
+}
+
+</script>
+<script>
+// Shared-link (Artifact) build only: fits the site to the claude.ai Artifact sandbox.
+//
+// - Claude titles and scoring run on the viewer's own Claude account instead of this
+//   project's server. Works with the current runtime (claude.use) and the older flat
+//   window.claude.sample.
+// - Export .md goes through the Artifact's download dialog, because the sandbox
+//   ignores links that download files.
+// - When the sandbox blocks dialogs, deleting asks for a second click instead.
+(function () {
+  const runtime = window.claude;
+
+  const notice = (() => {
+    let el;
+    let timer;
+    return (text) => {
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'artifact-notice';
+        el.setAttribute('role', 'status');
+        document.body.appendChild(el);
+      }
+      el.textContent = text;
+      el.hidden = false;
+      clearTimeout(timer);
+      timer = setTimeout(() => { el.hidden = true; }, 3600);
+    };
+  })();
+
+  const once = (load) => {
+    let promise;
+    return () => (promise ??= load().catch(() => null));
+  };
+
+  const getSampler = once(async () => {
+    if (runtime && typeof runtime.use === 'function') {
+      const sample = await runtime.use('sample');
+      return sample ? async (prompt) => (await sample(prompt, { modelTier: 'quick' })).text : null;
+    }
+    if (runtime && typeof runtime.sample === 'function') {
+      return async (prompt) => (await runtime.sample({ prompt, modelTier: 'quick' })).completion;
+    }
+    return null;
+  });
+
+  const getDownloads = once(async () => {
+    if (runtime && typeof runtime.use === 'function') return runtime.use('downloads');
+    return runtime && runtime.downloads ? runtime.downloads : null;
+  });
+
+  // The design asks Claude through Component#claude(prompt, system). The Artifact runtime
+  // has no system prompt, so the instructions lead the prompt. Any failure rejects, and the
+  // design falls back to its own title and heuristic score.
+  Component.prototype.claude = async function (prompt, system) {
+    const ask = await getSampler();
+    if (!ask) throw new Error('Claude is unavailable in this view.');
+    return ask(system ? `${system}\n\n${prompt}` : prompt);
+  };
+
+  const nativeClick = HTMLAnchorElement.prototype.click;
+  HTMLAnchorElement.prototype.click = function () {
+    if (!(this.download && this.href.startsWith('blob:'))) return nativeClick.call(this);
+    const filename = this.download;
+    const href = this.href;
+    (async () => {
+      const data = await (await fetch(href)).text();
+      const downloads = await getDownloads();
+      if (downloads) {
+        try {
+          await downloads.save({ filename, data });
+          return;
+        } catch (err) {
+          // The viewer said no, or a save prompt is already open.
+          if (err && (err.code === 'declined' || err.code === 'rate_limited')) return;
+        }
+      }
+      try {
+        await navigator.clipboard.writeText(data);
+        notice('Saving files isn’t available here, so the entry was copied as Markdown instead.');
+      } catch {
+        notice('Saving files isn’t available here. Use Copy to take the entry as Markdown.');
+      }
+    })();
+  };
+
+  // A blocked dialog makes confirm() return false instantly — faster than anyone can answer.
+  const nativeConfirm = window.confirm.bind(window);
+  let dialogsBlocked = false;
+  let pending = null;
+  window.confirm = (message) => {
+    if (!dialogsBlocked) {
+      const started = performance.now();
+      let answer = false;
+      try {
+        answer = nativeConfirm(message);
+      } catch {
+        answer = false;
+      }
+      if (answer || performance.now() - started > 100) return answer;
+      dialogsBlocked = true;
+    }
+    if (pending && pending.message === message && Date.now() - pending.at < 5000) {
+      pending = null;
+      return true;
+    }
+    pending = { message, at: Date.now() };
+    notice(`${message} Click again to confirm.`);
+    return false;
+  };
+})();
+
+</script>
+<script>
+DC.mount(document.getElementById('app'), document.getElementById('app-template'), Component, window.TWEAKS);
+</script>
+
+</body></html>
