@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KCLS Self-Checkout — Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- The kiosk is designed at 1920×1080; app.js scales the stage to fit any window. -->
+  <div class="stage" id="stage" data-screen="signin">
+
+    <header class="banner">
+      <div class="logo" aria-label="King County Library System">
+        <img class="logo__mark" src="assets/mark.svg" alt="" width="52" height="52">
+        <div class="logo__word"><span>King County</span><span>Library System</span></div>
+      </div>
+      <h1 class="banner__title" id="bannerTitle">CHECK OUT HERE</h1>
+    </header>
+
+    <!-- ============ 1. Sign in (from Figma 106:3) ============ -->
+    <main class="body screen" id="screen-signin">
+      <div class="main-row">
+        <section class="help" aria-label="Where to find your number">
+          <p class="help__title">WHERE TO FIND YOUR NUMBER</p>
+
+          <div class="card">
+            <div class="card__head">KING COUNTY LIBRARY SYSTEM</div>
+            <div class="card__body">
+              <div class="barcode" id="barcode" aria-hidden="true"></div>
+              <p class="card__num">0052908415</p>
+            </div>
+          </div>
+
+          <div class="callout">
+            <img src="assets/arrow.svg" alt="" width="28" height="32">
+            <p>Your card number is the 10 digits printed under the barcode on the back of your card.</p>
+          </div>
+
+          <div class="pin-hint">
+            <img src="assets/key.svg" alt="" width="28" height="28">
+            <p>Your PIN is usually the month and day you were born — for example, 0926 for September 26.</p>
+          </div>
+        </section>
+
+        <form class="form" id="signinForm" novalidate autocomplete="off">
+          <div class="field">
+            <label class="field__label" for="cardInput">Enter your library card number here</label>
+            <input class="field__input" id="cardInput" name="card" inputmode="numeric" maxlength="10"
+                   placeholder="Example:  0052908415" aria-describedby="cardHint" autofocus>
+            <p class="field__hint" id="cardHint" data-default="All 10 digits, including the zeros at the front.">All 10 digits, including the zeros at the front.</p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="pinInput">Enter your PIN here</label>
+            <input class="field__input" id="pinInput" name="pin" type="password" inputmode="numeric" maxlength="4"
+                   placeholder="Example:  0926" aria-describedby="pinHint">
+            <p class="field__hint" id="pinHint" data-default="Forgot your PIN? A staff member can reset it for you.">Forgot your PIN? A staff member can reset it for you.</p>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="btn btn--go" id="goBtn">GO&nbsp;&nbsp;&gt;&gt;&gt;</button>
+            <button type="button" class="btn btn--cancel" id="cancelBtn">CANCEL</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="bottom-row">
+        <button type="button" class="btn btn--hc" id="hcBtn" aria-pressed="false">
+          <img src="assets/contrast.svg" alt="" width="30" height="30">
+          <span id="hcLabel">Turn on High Contrast Mode</span>
+        </button>
+
+        <div class="get-card">
+          <p>Don’t have a library card yet?</p>
+          <button type="button" class="btn btn--getcard" id="getCardBtn">
+            <span>GET A LIBRARY CARD</span>
+            <img src="assets/plus.svg" alt="" width="28" height="28">
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============ 2. Get a library card (prototype extension) ============ -->
+    <main class="body screen" id="screen-getcard" hidden>
+      <div class="panel">
+        <h2 class="panel__title">Get a library card</h2>
+        <p class="panel__lead">It’s free for anyone who lives, works, goes to school, or owns property in King County.</p>
+        <ol class="steps">
+          <li><b>1</b><span>Bring a photo ID and proof of your address to any service desk.</span></li>
+          <li><b>2</b><span>A staff member will print your card and set your PIN with you.</span></li>
+          <li><b>3</b><span>Come back here and sign in with the number under the barcode.</span></li>
+        </ol>
+        <div class="actions">
+          <button type="button" class="btn btn--cancel" data-go="signin">BACK TO SIGN IN</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============ 3. Check out items (prototype extension) ============ -->
+    <main class="body screen" id="screen-checkout" hidden>
+      <div class="main-row main-row--top">
+        <section class="panel panel--list">
+          <p class="help__title" id="welcomeTitle">SIGNED IN · CARD ENDING 8415</p>
+          <h2 class="panel__title">Scan your items</h2>
+          <p class="panel__lead">Place one item at a time on the scanner, barcode facing down.</p>
+
+          <ul class="items" id="itemList" aria-live="polite"></ul>
+          <p class="items__empty" id="itemEmpty">No items yet. Scan your first item to begin.</p>
+        </section>
+
+        <aside class="panel panel--side">
+          <div class="summary">
+            <span class="summary__label">ITEMS CHECKED OUT</span>
+            <span class="summary__count" id="itemCount">0</span>
+          </div>
+          <button type="button" class="btn btn--hc btn--wide" id="scanBtn">
+            <span>Simulate scanning an item</span>
+          </button>
+          <div class="actions actions--stack">
+            <button type="button" class="btn btn--go btn--wide" id="doneBtn" disabled>DONE</button>
+            <button type="button" class="btn btn--cancel btn--wide" id="signOutBtn">CANCEL</button>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <!-- ============ 4. Receipt / done (prototype extension) ============ -->
+    <main class="body screen" id="screen-receipt" hidden>
+      <div class="panel panel--center">
+        <div class="tick" aria-hidden="true">✓</div>
+        <h2 class="panel__title" id="receiptTitle">You’re all set!</h2>
+        <p class="panel__lead" id="receiptLead">Would you like a receipt?</p>
+        <div class="due" id="dueNote"></div>
+        <div class="actions" id="receiptActions">
+          <button type="button" class="btn btn--go" data-receipt="print">PRINT</button>
+          <button type="button" class="btn btn--hc" data-receipt="email">EMAIL</button>
+          <button type="button" class="btn btn--cancel" data-receipt="none">NO RECEIPT</button>
+        </div>
+        <p class="restart" id="restartNote" hidden>Returning to the start in <b id="countdown">8</b>…
+          <button type="button" class="btn btn--hc" id="restartBtn">START OVER</button></p>
+      </div>
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
