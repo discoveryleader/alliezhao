@@ -15,7 +15,7 @@
 
     <header class="banner">
       <div class="logo" aria-label="King County Library System">
-        <img class="logo__mark" src="assets/mark.svg" alt="" width="52" height="52">
+        <svg class="logo__mark" width="52" height="52" viewBox="0 0 52 52" aria-hidden="true"><rect width="52" height="52" rx="2" fill="#111111"></rect><path d="M10 40 L22 15 L29 29 L25 40 Z" fill="#ffffff"></path><path d="M27 40 L35 24 L43 40 Z" fill="#ffffff"></path><rect x="35" y="9" width="8" height="8" fill="#d8292e"></rect></svg>
         <div class="logo__word"><span>King County</span><span>Library System</span></div>
       </div>
       <h1 class="banner__title" id="bannerTitle">CHECK OUT HERE</h1>
@@ -36,12 +36,12 @@
           </div>
 
           <div class="callout">
-            <img src="assets/arrow.svg" alt="" width="28" height="32">
+            <svg width="28" height="32" viewBox="0 0 28 32" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 29 V4"></path><path d="M4 14 L14 4 L24 14"></path></svg>
             <p>Your card number is the 10 digits printed under the barcode on the back of your card.</p>
           </div>
 
           <div class="pin-hint">
-            <img src="assets/key.svg" alt="" width="28" height="28">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="6"></circle><path d="M13.3 13.3 L25 25"></path><path d="M19.5 19.5 L22.5 16.5"></path><path d="M22.5 22.5 L25.5 19.5"></path></svg>
             <p>Your PIN is usually the month and day you were born — for example, 0926 for September 26.</p>
           </div>
         </section>
@@ -70,7 +70,7 @@
 
       <div class="bottom-row">
         <button type="button" class="btn btn--hc" id="hcBtn" aria-pressed="false">
-          <img src="assets/contrast.svg" alt="" width="30" height="30">
+          <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="12" fill="none" stroke="currentColor" stroke-width="3"></circle><path d="M15 3 A12 12 0 0 0 15 27 Z" fill="currentColor"></path></svg>
           <span id="hcLabel">Turn on High Contrast Mode</span>
         </button>
 
@@ -78,7 +78,7 @@
           <p>Don’t have a library card yet?</p>
           <button type="button" class="btn btn--getcard" id="getCardBtn">
             <span>GET A LIBRARY CARD</span>
-            <img src="assets/plus.svg" alt="" width="28" height="28">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M14 4 V24"></path><path d="M4 14 H24"></path></svg>
           </button>
         </div>
       </div>
@@ -118,6 +118,7 @@
             <span class="summary__count" id="itemCount">0</span>
           </div>
           <button type="button" class="btn btn--hc btn--wide" id="scanBtn">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M3 9 V3 H9"></path><path d="M21 3 H27 V9"></path><path d="M27 21 V27 H21"></path><path d="M9 27 H3 V21"></path><path d="M9 10 V20"></path><path d="M13 10 V20"></path><path d="M17 10 V20"></path><path d="M21 10 V20"></path></svg>
             <span>Simulate scanning an item</span>
           </button>
           <div class="actions actions--stack">
@@ -131,14 +132,14 @@
     <!-- ============ 4. Receipt / done (prototype extension) ============ -->
     <main class="body screen" id="screen-receipt" hidden>
       <div class="panel panel--center">
-        <div class="tick" aria-hidden="true">✓</div>
+        <div class="tick" aria-hidden="true"><svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 33 L27 46 L51 19"></path></svg></div>
         <h2 class="panel__title" id="receiptTitle">You’re all set!</h2>
-        <p class="panel__lead" id="receiptLead">Would you like a receipt?</p>
         <div class="due" id="dueNote"></div>
+        <p class="panel__lead" id="receiptLead">Would you like a receipt?</p>
         <div class="actions" id="receiptActions">
-          <button type="button" class="btn btn--go" data-receipt="print">PRINT</button>
-          <button type="button" class="btn btn--hc" data-receipt="email">EMAIL</button>
-          <button type="button" class="btn btn--cancel" data-receipt="none">NO RECEIPT</button>
+          <button type="button" class="btn btn--go btn--receipt" data-receipt="print">PRINT</button>
+          <button type="button" class="btn btn--hc btn--receipt" data-receipt="email">EMAIL</button>
+          <button type="button" class="btn btn--cancel btn--receipt" data-receipt="none">NO RECEIPT</button>
         </div>
         <p class="restart" id="restartNote" hidden>Returning to the start in <b id="countdown">8</b>…
           <button type="button" class="btn btn--hc" id="restartBtn">START OVER</button></p>

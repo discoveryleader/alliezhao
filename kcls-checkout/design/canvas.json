@@ -1,0 +1,18 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-11-04T20:10:00Z"},
+  "title": "KCLS Self-Checkout",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 1920, "h": 1080, "title": "1 · Sign in", "is_interactive": true},
+    "Checkout.dc.html": {"x": 2000, "y": 0, "w": 1920, "h": 1080, "title": "2 · Scan items", "is_interactive": true},
+    "Receipt.dc.html": {"x": 4000, "y": 0, "w": 1920, "h": 1080, "title": "3 · Receipt", "is_interactive": true},
+    "GetCard.dc.html": {"x": 0, "y": 1200, "w": 1920, "h": 1080, "title": "Side path · Get a library card", "is_interactive": true}
+  },
+  "order": ["Main.dc.html", "Checkout.dc.html", "Receipt.dc.html", "GetCard.dc.html"],
+  "notes": {
+    "flowTitle": {"x": 0, "y": -300, "text": "KCLS Self-Checkout — main flow", "kind": "title1", "maxW": 5920}
+  },
+  "designSystems": []
+}

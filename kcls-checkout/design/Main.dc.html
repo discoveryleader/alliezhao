@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KCLS Self-Checkout — Sign in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#8c2231}a:hover{color:#5e1320}
+input::placeholder{color:#8c8781;opacity:1}
+input:focus{outline:none;border-color:#8c2231 !important;box-shadow:0 0 0 5px rgba(140,34,49,.25)}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1080px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; font-family: Inter, system-ui, sans-serif; background: {{t.bg}}; color: {{t.ink}}">
+
+  <header style="position: relative; flex: none; height: 104px; background: #d8292e; display: flex; align-items: center; justify-content: center">
+    <div style="position: absolute; left: 24px; top: 14px; display: flex; align-items: center; gap: 14px; padding: 12px 22px 12px 16px; background: #ffffff; color: #111111">
+      <svg width="52" height="52" viewBox="0 0 52 52" aria-hidden="true"><rect width="52" height="52" rx="2" fill="#111111"></rect><path d="M10 40 L22 15 L29 29 L25 40 Z" fill="#ffffff"></path><path d="M27 40 L35 24 L43 40 Z" fill="#ffffff"></path><rect x="35" y="9" width="8" height="8" fill="#d8292e"></rect></svg>
+      <div style="display: flex; flex-direction: column; font-weight: 700; font-size: 19px; line-height: 23px; white-space: nowrap"><span>King County</span><span>Library System</span></div>
+    </div>
+    <h1 style="margin: 0; color: #ffffff; font-weight: 800; font-size: 46px; letter-spacing: 1.5px; white-space: nowrap">CHECK OUT HERE</h1>
+  </header>
+
+  <main style="flex: 1 1 0; min-height: 0; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; padding: 52px 72px 44px">
+    <div style="flex: 1 1 0; min-height: 0; display: flex; align-items: center; gap: 64px">
+
+      <section style="flex: none; width: 700px; display: flex; flex-direction: column; gap: 22px">
+        <p style="margin: 0; color: {{t.accent}}; font-weight: 800; font-size: 22px; letter-spacing: 1.6px; white-space: nowrap">WHERE TO FIND YOUR NUMBER</p>
+
+        <div style="width: 620px; background: #ffffff; color: #111111; border: 3px solid #111111; border-radius: 14px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.16)">
+          <div style="background: #8c2231; color: #ffffff; padding: 16px 24px; font-weight: 800; font-size: 20px; letter-spacing: 1.2px; white-space: nowrap">KING COUNTY LIBRARY SYSTEM</div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 28px 30px 26px">
+            <div style="position: relative; width: 500px; height: 110px; background: #ffffff; overflow: hidden" aria-hidden="true">
+              <sc-for list="{{bars}}" as="bar" hint-placeholder-count="39">
+                <div style="position: absolute; top: 0; height: 110px; background: #111111; left: {{bar.l}}px; width: {{bar.w}}px"></div>
+              </sc-for>
+            </div>
+            <p style="margin: 0; font-weight: 700; font-size: 40px; letter-spacing: 6px; white-space: nowrap">0052908415</p>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: flex-start; gap: 14px">
+          <svg width="28" height="32" viewBox="0 0 28 32" fill="none" stroke="{{t.accent}}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M14 29 V4"></path><path d="M4 14 L14 4 L24 14"></path></svg>
+          <p style="flex: 1 1 0; margin: 0; font-weight: 500; font-size: 25px; line-height: 34px">Your card number is the 10 digits printed under the barcode on the back of your card.</p>
+        </div>
+
+        <div style="display: flex; align-items: flex-start; gap: 14px; padding: 22px 24px; background: {{t.cream}}; border: 2px solid {{t.creamLine}}; border-radius: 10px">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="{{t.soft}}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><circle cx="9" cy="9" r="6"></circle><path d="M13.3 13.3 L25 25"></path><path d="M19.5 19.5 L22.5 16.5"></path><path d="M22.5 22.5 L25.5 19.5"></path></svg>
+          <p style="flex: 1 1 0; margin: 0; font-weight: 500; font-size: 23px; line-height: 32px; color: {{t.soft}}">Your PIN is usually the month and day you were born — for example, 0926 for September 26.</p>
+        </div>
+      </section>
+
+      <form style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 34px" autocomplete="off">
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <label for="cardInput" style="font-weight: 700; font-size: 32px; line-height: 40px; white-space: nowrap">Enter your library card number here</label>
+          <input id="cardInput" inputmode="numeric" maxlength="10" placeholder="Example:  0052908415" style="width: 100%; height: 112px; box-sizing: border-box; padding: 0 28px; border: 4px solid #8c2231; border-radius: 8px; box-shadow: 0 0 0 5px rgba(140,34,49,0.25); font-family: inherit; font-size: 30px; font-weight: 500; background: {{t.bg}}; color: {{t.ink}}" />
+          <p style="margin: 0; font-weight: 500; font-size: 22px; line-height: 30px; color: {{t.muted}}">All 10 digits, including the zeros at the front.</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <label for="pinInput" style="font-weight: 700; font-size: 32px; line-height: 40px; white-space: nowrap">Enter your PIN here</label>
+          <input id="pinInput" type="password" inputmode="numeric" maxlength="4" placeholder="Example:  0926" style="width: 100%; height: 112px; box-sizing: border-box; padding: 0 28px; border: 3px solid {{t.ink}}; border-radius: 8px; font-family: inherit; font-size: 30px; font-weight: 500; background: {{t.bg}}; color: {{t.ink}}" />
+          <p style="margin: 0; font-weight: 500; font-size: 22px; line-height: 30px; color: {{t.muted}}">Forgot your PIN? A staff member can reset it for you.</p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 20px; padding-top: 6px">
+          <a href="Checkout.dc.html" style="box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; width: 300px; height: 96px; background: #4c8c2b; border: 3px solid #3a6e20; border-radius: 8px; color: #ffffff; font-weight: 800; font-size: 32px; letter-spacing: 1.2px; text-decoration: none; white-space: pre">GO  &gt;&gt;&gt;</a>
+          <button type="reset" style="box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; width: 240px; height: 96px; background: #e8c13c; border: 3px solid #c49c1e; border-radius: 8px; color: #111111; font-family: inherit; font-weight: 800; font-size: 32px; letter-spacing: 1.2px; cursor: pointer">CANCEL</button>
+        </div>
+      </form>
+    </div>
+
+    <div style="flex: none; display: flex; align-items: flex-end; justify-content: space-between; padding-top: 28px">
+      <button type="button" onClick="{{toggleHc}}" aria-pressed="{{hcPressed}}" style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 14px; height: 84px; padding: 0 30px 0 26px; background: {{t.bg}}; color: {{t.ink}}; border: 3px solid {{t.ink}}; border-radius: 8px; font-family: inherit; font-weight: 700; font-size: 25px; cursor: pointer">
+        <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="12" fill="none" stroke="currentColor" stroke-width="3"></circle><path d="M15 3 A12 12 0 0 0 15 27 Z" fill="currentColor"></path></svg>
+        <span>{{hcLabel}}</span>
+      </button>
+
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px">
+        <p style="margin: 0; font-weight: 500; font-size: 26px; color: {{t.soft}}">Don’t have a library card yet?</p>
+        <a href="GetCard.dc.html" style="box-sizing: border-box; display: inline-flex; align-items: center; gap: 16px; height: 96px; padding: 0 40px; background: linear-gradient(180deg, #9b2a39, #711926); border: 3px solid #5e1320; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.22); color: #ffffff; font-weight: 800; font-size: 32px; letter-spacing: 1.4px; text-decoration: none; white-space: nowrap">
+          <span>GET A LIBRARY CARD</span>
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M14 4 V24"></path><path d="M4 14 H24"></path></svg>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"highContrast":{"editor":"boolean","default":false},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const BARS = [[6,5.7],[17.4,3.8],[28.8,9.5],[42.1,3.8],[51.6,5.7],[66.8,11.4],[82,3.8],[93.4,7.6],[104.8,5.7],[116.2,3.8],[129.5,9.5],[142.8,5.7],[156.1,3.8],[165.6,11.4],[180.8,7.6],[197.9,3.8],[207.4,5.7],[216.9,9.5],[234,3.8],[241.6,7.6],[258.7,5.7],[270.1,11.4],[285.3,3.8],[296.7,5.7],[308.1,9.5],[321.4,3.8],[334.7,7.6],[348,3.8],[359.4,5.7],[368.9,11.4],[386,3.8],[399.3,9.5],[412.6,5.7],[425.9,3.8],[435.4,7.6],[446.8,5.7],[462,9.5],[475.3,3.8],[486.7,11.4]];
+    const hc = (this.state && this.state.hc !== undefined) ? this.state.hc : (this.props.highContrast ?? false);
+    const t = hc
+      ? { bg: '#000000', ink: '#ffffff', soft: '#ffffff', muted: '#f2f2f2', accent: '#ffe600', cream: '#000000', creamLine: '#ffffff' }
+      : { bg: '#ffffff', ink: '#111111', soft: '#3a3632', muted: '#6b6660', accent: '#8c2231', cream: '#f3efea', creamLine: '#d9d2c9' };
+    return {
+      t,
+      bars: BARS.map(([l, w]) => ({ l, w })),
+      hcPressed: hc ? 'true' : 'false',
+      hcLabel: hc ? 'Turn off High Contrast Mode' : 'Turn on High Contrast Mode',
+      toggleHc: () => this.setState({ hc: !hc }),
+    };
+  }
+}
+</script>
+</body>
+</html>
